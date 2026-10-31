@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>sajad matlap</title>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js" onerror="window.__plotlyFail=1"></script>
+<script>
+/* Plotly fallback chain: if the primary CDN failed, try other HTTPS mirrors in order. */
+(function(){
+ window.plotlyState=typeof Plotly!=='undefined'?'ok':'loading';
+ if(window.plotlyState==='ok')return;
+ var urls=['https://unpkg.com/plotly.js-dist-min@2.35.2/plotly.min.js','https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js'],i=0;
+ function next(){
+  if(typeof Plotly!=='undefined'){window.plotlyState='ok';return}
+  if(i>=urls.length){window.plotlyState='failed';if(window.render)try{render()}catch(e){}return}
+  var s=document.createElement('script');s.src=urls[i++];
+  s.onload=function(){window.plotlyState='ok';if(window.render)try{render()}catch(e){}};
+  s.onerror=next;document.head.appendChild(s)}
+ next()})();
+</script>
+<style>
+:root{--bar:#0B2A5B;--panel:#fff;--stage:#fff;--ink:#14213A;--muted:#5B6B86;--line:#D5DCE8;--acc:#1F5FD1;--on:#fff;--err:#B42318;--code:#F3F6FB;--fs:14px;--tc:inherit}
+[data-theme=dark]{--bar:#081A3D;--panel:#101B2E;--stage:#0C1422;--ink:#E4ECF8;--muted:#93A4C0;--line:#26364F;--acc:#5B9BFF;--on:#06142E;--err:#FF8A80;--code:#0A1322}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans Arabic','Noto Sans',Arial,sans-serif;color:var(--ink);background:var(--panel);display:flex;flex-direction:column;height:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bar);color:#fff}
+.ttl{font-weight:600;font-size:17px}
+.sp{flex:1}
+.ib{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:8px;min-width:38px;height:38px;padding:0 10px;font-size:17px;display:inline-flex;align-items:center;gap:6px}
+.ib span{font-size:14px}
+.ib:hover{background:rgba(255,255,255,.14)}
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--stage)}
+#plot{position:absolute;inset:0}
+#empty{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);text-align:center;padding:20px;pointer-events:none}
+.ph{padding:4px 14px;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;min-height:38px}
+.sm{height:30px!important;font-size:13px!important;min-width:0!important;padding:0 12px!important}
+#con,#sout{margin:0;padding:4px 14px 10px;flex:1;min-height:0;overflow:auto;font:var(--fs)/1.45 ui-monospace,Consolas,Menlo,monospace;color:var(--tc);direction:ltr;text-align:left;white-space:pre-wrap}
+.err{color:var(--err);font-weight:600}
+.cmdbar{display:flex;gap:8px;padding:10px 12px;background:var(--panel);border-block-start:1px solid var(--line)}
+.cmdbar input{flex:1;font-size:16px;height:44px;padding:0 14px;border-radius:22px}
+.pri{background:var(--acc);color:var(--on);border:0;border-radius:22px;min-width:52px;height:44px;padding:0 18px;font-weight:600;font-size:18px}
+.sec{background:transparent;border:1px solid var(--line);border-radius:22px;height:44px;padding:0 16px;font-weight:600}
+.sec:hover{border-color:var(--acc)}
+.pr{align-self:center;font:600 17px ui-monospace,Consolas,Menlo,monospace;color:var(--acc);direction:ltr}
+.sig{padding:4px 12px 6px;text-align:center;font-size:12px;color:var(--muted);background:var(--panel)}
+input,select,textarea{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:100%;min-width:0}
+input[type=range],input[type=checkbox],input[type=color]{width:auto;padding:0}
+input[type=color]{width:40px;height:30px}
+.code{font-family:ui-monospace,Consolas,Menlo,monospace;font-size:13px;direction:ltr;text-align:left}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-block-end:8px;font-size:16px}
+.x{background:none;border:0;font-size:18px;color:var(--muted)}
+h2{font-size:13px;margin:14px 0 6px;color:var(--muted);font-weight:600}
+.tabs{display:flex;gap:4px;border-block-end:1px solid var(--line);margin-block-end:10px;flex-wrap:wrap}
+.tab{background:none;border:0;border-block-end:3px solid transparent;padding:6px 10px;color:var(--muted);font-weight:600}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--acc)}
+.modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);z-index:30;padding:10px}
+.modal[hidden]{display:none}
+.mbox{background:var(--panel);width:min(660px,100%);max-height:90vh;overflow:auto;border-radius:12px;padding:16px 18px}
+.mbox section{border-block-start:1px solid var(--line);padding-block:6px 10px}
+.mbox label{display:flex;gap:10px;align-items:center;margin-block:8px}
+.note{margin:0;color:var(--muted);font-size:13px}
+.gi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-block-end:10px}
+.gi b{display:block}
+.gi p{margin:4px 0 6px;font-size:14px}
+.gc{margin:0 0 8px;padding:8px 10px;background:var(--code);border-radius:6px;white-space:pre-wrap}
+@media(max-width:560px){.ib span{display:none}.ttl{font-size:15px}.sec{padding:0 10px}}
+.figwrap{position:relative;height:min(68vh,560px)}
+#empty[hidden]{display:none}
+.mbox.wide{width:min(1100px,100%)}
+#scr{display:block;width:100%;height:38vh;min-height:170px;resize:vertical;white-space:pre;overflow:auto;font-size:var(--fs);line-height:1.45;tab-size:2}
+.srow{display:flex;align-items:center;gap:8px;margin-block:8px}
+#sout{height:22vh;min-height:90px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--code);padding:8px 12px;flex:none}
+.stage .ph{border-block-end:1px solid var(--line)}
+.bk{border:1px solid var(--acc);border-radius:10px;padding:4px 12px 8px;margin-block-end:12px}
+.bk h3,.gh{font-size:15px;margin:12px 0 8px;color:var(--acc)}
+.bk .gi b.code{color:var(--ink);background:var(--code);padding:2px 8px;border-radius:6px;display:inline-block;margin-block-end:4px}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="ttl" data-i="title"></span>
+  <span class="sp"></span>
+  <button class="ib" id="scrBtn" data-ti="scr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/></svg><span data-i="scrT"></span></button>
+  <button class="ib" id="figBtn" data-ti="figT"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span data-i="figT"></span></button>
+  <button class="ib" id="themeBtn" data-ti="theme">☾</button>
+  <button class="ib" id="setBtn" data-ti="set">⚙</button>
+</header>
+
+<main class="stage">
+  <div class="ph"><b data-i="conT"></b><span class="sp"></span><button class="sec sm" id="conClr" data-i="clr"></button></div>
+  <pre id="con" aria-live="polite"></pre>
+</main>
+
+<div class="cmdbar">
+  <b class="pr" id="pr">&gt;&gt;</b>
+  <input id="cmd" class="code" dir="ltr" spellcheck="false" autocomplete="off" data-p="cmdPh" style="font-size:16px">
+  <button class="pri" id="go" aria-label="Run">▷</button>
+</div>
+<footer class="sig" data-i="foot"></footer>
+
+<div class="modal" id="mSet" hidden><div class="mbox" role="dialog" aria-modal="true">
+  <div class="dh"><b data-i="set"></b><button class="x" data-close aria-label="Close">✕</button></div>
+  <section><h2 data-i="appr"></h2><select id="thSel"><option value="light" data-i="light"></option><option value="dark" data-i="dark"></option></select></section>
+  <section><h2 data-i="langL"></h2><select id="langSel"><option value="en">English</option><option value="ar">العربية</option></select></section>
+  <section><h2 data-i="typo"></h2><p class="note" data-i="typoN"></p></section>
+  <section><h2 data-i="fnS"></h2>
+    <label><span data-i="fsz"></span><input type="range" id="fsz" min="10" max="28" value="14"><output id="fszv">14</output></label>
+    <label><span data-i="lc"></span><input type="color" id="lcol" value="#1f6feb"><button class="sec" style="height:32px;font-size:13px" id="lreset" data-i="reset"></button></label>
+    <label><span data-i="tc"></span><input type="color" id="tcol" value="#14213a"><button class="sec" style="height:32px;font-size:13px" id="treset" data-i="reset"></button></label>
+  </section>
+  <section><button class="pri" id="guideBtn" style="height:40px;font-size:15px" data-i="guide"></button></section>
+</div></div>
+
+<div class="modal" id="mGuide" hidden><div class="mbox" style="width:min(760px,100%)" role="dialog" aria-modal="true">
+  <div class="dh"><b data-i="guide"></b><button class="x" data-close aria-label="Close">✕</button></div>
+  <div class="tabs" id="gtabs"></div><div id="gbody"></div>
+</div></div>
+
+<div class="modal" id="mScr" hidden><div class="mbox wide" role="dialog" aria-modal="true">
+  <div class="dh"><b data-i="scr"></b><button class="x" data-close aria-label="Close">✕</button></div>
+  <textarea id="scr" class="code" dir="ltr" spellcheck="false" autocapitalize="off" data-p="scrPh"></textarea>
+  <div class="srow"><button class="sec sm" id="scrClr" data-i="clr"></button><span class="sp"></span><button class="pri sm" id="scrRun" aria-label="Run script">▷ <span data-i="run"></span></button></div>
+  <div class="ph" style="padding-inline:0"><b data-i="conT"></b></div><pre id="sout" aria-live="polite"></pre>
+</div></div>
+
+<div class="modal" id="mFig" hidden><div class="mbox wide" role="dialog" aria-modal="true">
+  <div class="dh"><b data-i="figT"></b><button class="x" data-close aria-label="Close">✕</button></div>
+  <div class="figwrap"><div id="plot"></div><div id="empty"></div></div>
+</div></div>
+
+<div class="modal" id="mMsg" hidden><div class="mbox" style="width:min(380px,100%)" role="alertdialog" aria-modal="true">
+  <div class="dh"><b id="mt"></b></div><p id="mm" style="white-space:pre-wrap"></p>
+  <button class="pri" data-close style="height:38px;font-size:15px" data-i="ok"></button>
+</div></div>
+
+<script>
+'use strict';
+/* ---------- matrix core ---------- */
+class M{constructor(r,c,d){this.r=r;this.c=c;this.d=d}}
+const S=x=>new M(1,1,[x]),vec=a=>new M(1,a.length,a),lg=m=>(m.lg=1,m);
+const tru=v=>typeof v=='string'?v.length>0:v instanceof M&&v.d.length>0&&v.d.every(x=>x!=0);
+function bc(a,b,f){const r=a.r==b.r?a.r:a.r==1?b.r:b.r==1?a.r:-1,c=a.c==b.c?a.c:a.c==1?b.c:b.c==1?a.c:-1;
+ if(r<0||c<0)throw Error('Arrays have incompatible sizes for this operation.');
+ const d=[];for(let j=0;j<c;j++)for(let i=0;i<r;i++)d.push(f(a.d[(a.r==1?0:i)+(a.c==1?0:j)*a.r],b.d[(b.r==1?0:i)+(b.c==1?0:j)*b.r]));return new M(r,c,d)}
+function mul(a,b){if(a.d.length==1||b.d.length==1)return bc(a,b,(x,y)=>x*y);
+ if(a.c!=b.r)throw Error('Incorrect dimensions for matrix multiplication. Check that the number of columns in the first matrix matches the number of rows in the second.');
+ const o=new Array(a.r*b.c).fill(0);for(let i=0;i<a.r;i++)for(let j=0;j<b.c;j++)for(let k=0;k<a.c;k++)o[i+j*a.r]+=a.d[i+k*a.r]*b.d[k+j*b.r];return new M(a.r,b.c,o)}
+function tr(m){const d=[];for(let i=0;i<m.r;i++)for(let j=0;j<m.c;j++)d.push(m.d[i+j*m.r]);return new M(m.c,m.r,d)}
+const rowsOf=m=>Array.from({length:m.r},(_,i)=>Array.from({length:m.c},(_,j)=>m.d[i+j*m.r]));
+const fromRows=R=>{const r=R.length,c=R[0].length,d=[];for(let j=0;j<c;j++)for(let i=0;i<r;i++)d.push(R[i][j]);return new M(r,c,d)};
+const eye=n=>{const d=new Array(n*n).fill(0);for(let i=0;i<n;i++)d[i*n+i]=1;return new M(n,n,d)};
+function det(m){if(m.r!=m.c)throw Error('Matrix must be square.');const A=rowsOf(m),n=m.r;let D=1;
+ for(let i=0;i<n;i++){let p=i;for(let k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;if(Math.abs(A[p][i])<1e-14)return 0;
+  if(p!=i){[A[p],A[i]]=[A[i],A[p]];D=-D}D*=A[i][i];for(let k=i+1;k<n;k++){const f=A[k][i]/A[i][i];for(let j=i;j<n;j++)A[k][j]-=f*A[i][j]}}
+ return Math.round(D*1e10)/1e10}
+function inv(m){if(m.r!=m.c)throw Error('Matrix must be square.');const n=m.r,A=rowsOf(m).map((r,i)=>[...r,...Array.from({length:n},(_,j)=>+(i==j))]);
+ for(let i=0;i<n;i++){let p=i;for(let k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;
+  if(Math.abs(A[p][i])<1e-14)throw Error('Matrix is singular to working precision.');[A[p],A[i]]=[A[i],A[p]];
+  const d=A[i][i];for(let j=0;j<2*n;j++)A[i][j]/=d;
+  for(let k=0;k<n;k++)if(k!=i){const f=A[k][i];for(let j=0;j<2*n;j++)A[k][j]-=f*A[i][j]}}
+ return fromRows(A.map(r=>r.slice(n)))}
+function red(m,f){if(m.r==1||m.c==1)return S(f(m.d));const o=[];for(let j=0;j<m.c;j++)o.push(f(m.d.slice(j*m.r,(j+1)*m.r)));return vec(o)}
+function mat(R){const fl=R.flat();
+ if(fl.some(x=>typeof x=='string'))return fl.map(x=>typeof x=='string'?x:String.fromCharCode(...x.d)).join('');
+ const rs=R.map(r=>{const h=r.filter(x=>x.d.length);if(!h.length)return null;const rr=h[0].r;
+  if(h.some(x=>x.r!=rr))throw Error('Dimensions of arrays being concatenated are not consistent.');
+  const d=[];h.forEach(x=>d.push(...x.d));return new M(rr,d.length/rr,d)}).filter(Boolean);
+ if(!rs.length)return new M(0,0,[]);const c=rs[0].c;
+ if(rs.some(x=>x.c!=c))throw Error('Dimensions of arrays being concatenated are not consistent.');
+ const r=rs.reduce((s,x)=>s+x.r,0),d=new Array(r*c);let o=0;
+ rs.forEach(x=>{for(let i=0;i<x.r;i++)for(let j=0;j<c;j++)d[o+i+j*r]=x.d[i+j*x.r];o+=x.r});return new M(r,c,d)}
+function rng(a,s,b){const A=a.d[0],B=b.d[0],st=s?s.d[0]:1;if(!st)return new M(1,0,[]);const n=Math.floor((B-A)/st+1e-10)+1,d=[];for(let i=0;i<n;i++)d.push(A+i*st);return vec(d)}
+
+/* ---------- formatting ---------- */
+const f4=x=>isNaN(x)?'NaN':!isFinite(x)?(x>0?'Inf':'-Inf'):x.toFixed(4);
+const fnum=x=>Number.isInteger(x)?String(x):(isFinite(x)&&(Math.abs(x)>=1e5||Math.abs(x)<1e-3))?x.toExponential(4):f4(x);
+function fm(m){if(!m.d.length)return'[]';const ints=m.d.every(Number.isInteger),s=m.d.map(x=>ints?String(x):f4(x)),w=Math.max(...s.map(x=>x.length))+3,o=[];
+ for(let i=0;i<m.r;i++){let l='';for(let j=0;j<m.c;j++)l+=s[i+j*m.r].padStart(w);o.push(l)}return o.join('\n')}
+function fmt(f,args){const flat=[];args.forEach(a=>typeof a=='string'?flat.push(a):a.d.forEach(x=>flat.push(x)));let k=0,o='';
+ const pass=()=>f.replace(/%%|%([-+0 ]*)(\d*)(?:\.(\d+))?([dfgeiscox])|\\([ntr\\])/g,(m,fl,w,pr,ty,es)=>{
+  if(m=='%%')return'%';if(es)return{n:'\n',t:'\t',r:'\r','\\':'\\'}[es];
+  const v=flat[k++];if(v===undefined)return'';
+  let s=ty=='f'?(+v).toFixed(pr==null?6:+pr):ty=='e'?(+v).toExponential(pr==null?6:+pr):ty=='g'?String(+(+v).toPrecision(pr?+pr:6)):ty=='o'?(+v).toString(8):ty=='x'?(+v).toString(16):String(v);
+  if(fl.includes('+')&&typeof v=='number'&&v>=0)s='+'+s;
+  if(w)s=fl.includes('-')?s.padEnd(+w):fl.includes('0')&&ty!='s'?s.padStart(+w,'0'):s.padStart(+w);return s});
+ do{const k0=k;o+=pass();if(k==k0)break}while(k<flat.length);return o}
+
+/* ---------- tokenizer & parser ---------- */
+function tok(s){const t=[],OPS=['.*','./','.^',".'",'==','~=','!=','<=','>=','&&','||'];let i=0,sp=false,m;
+ while(i<s.length){const c=s[i];if(/\s/.test(c)){sp=true;i++;continue}
+  const R=s.slice(i),pv=t[t.length-1],val=pv&&(pv.t=='n'||pv.t=='i'||(pv.t=='o'&&[')',']','}',"'",".'"].includes(pv.v)));let x;
+  if(m=R.match(/^(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/)){let q=m[0];if(/\.$/.test(q)&&/^[*\/^\\']/.test(R.slice(q.length)))q=q.slice(0,-1);x={t:'n',v:parseFloat(q)};i+=q.length}
+  else if(m=R.match(/^[A-Za-z_]\w*/)){x={t:'i',v:m[0]};i+=m[0].length}
+  else if((c=="'"&&!val)||c=='"'){let j=i+1,r='';while(j<s.length){if(s[j]==c){if(s[j+1]==c){r+=c;j+=2;continue}break}r+=s[j++]}
+   if(j>=s.length)throw Error('Unterminated string.');x={t:'s',v:r};i=j+1}
+  else{const o=OPS.find(q=>R.startsWith(q))||c;x={t:'o',v:o};i+=o.length}
+  x.sb=sp;sp=false;t.push(x)}
+ return t}
+function parse(str){const T=tok(str);let p=0;const ctx=[0];
+ const isO=v=>p<T.length&&T[p].t=='o'&&T[p].v==v,eat=v=>{if(!isO(v))throw Error('Expected "'+v+'"');p++},inMat=()=>ctx[ctx.length-1]==1;
+ const sepAt=()=>inMat()&&T[p].sb&&p+1<T.length&&!T[p+1].sb;
+ const bin=(next,ops)=>()=>{let a=next();while(p<T.length&&T[p].t=='o'&&ops.includes(T[p].v)){if((T[p].v=='+'||T[p].v=='-')&&sepAt())break;const o=T[p++].v;a={t:'b',o,a,b:next()}}return a};
+ function pPrim(){const k=T[p];if(!k)throw Error('Unexpected end of expression');
+  if(k.t=='n'){p++;return{t:'n',v:k.v}}if(k.t=='s'){p++;return{t:'s',v:k.v}}
+  if(k.t=='i'){p++;return k.v=='end'?{t:'end'}:{t:'id',n:k.v}}
+  if(isO('(')){p++;ctx.push(0);const e=pOr();ctx.pop();eat(')');return e}
+  if(isO('[')||isO('{')){const cell=T[p].v=='{',cl=cell?'}':']';p++;ctx.push(1);const rows=[[]];
+   while(!isO(cl)){if(p>=T.length)throw Error('Missing "'+cl+'"');if(isO(';')){p++;rows.push([])}else if(isO(','))p++;else rows[rows.length-1].push(pOr())}
+   p++;ctx.pop();return cell?{t:'cell',items:rows.flat()}:{t:'m',rows:rows.filter(r=>r.length)}}
+  if(isO('@')){p++;if(T[p]&&T[p].t=='i')return{t:'fr',n:T[p++].v};eat('(');const ps=[];while(!isO(')')){if(p>=T.length)throw Error('Missing ")"');ps.push(T[p++].v);if(isO(','))p++}p++;ctx.push(0);const b=pOr();ctx.pop();return{t:'fn',ps,b}}
+  throw Error('Unexpected "'+k.v+'"')}
+ function pPost(){let a=pPrim();for(;;){
+  if((isO('(')||isO('{'))&&!(inMat()&&T[p].sb)){const cl=T[p].v=='{'?'}':')';p++;ctx.push(0);const args=[];
+   while(!isO(cl)){if(p>=T.length)throw Error('Missing "'+cl+'"');if(isO(':')&&T[p+1]&&(T[p+1].v==','||T[p+1].v==cl)){p++;args.push({t:'co'})}else args.push(pOr());if(isO(','))p++}
+   p++;ctx.pop();a={t:'c',f:a,args}}
+  else if(isO("'")||isO(".'")){p++;a={t:'tr',a}}else return a}}
+ function pPowOp(){if(isO('-')||isO('+')||isO('~')){const o=T[p++].v;return{t:'u',o,a:pPowOp()}}return pPost()}
+ function pPow(){let a=pPost();while(isO('^')||isO('.^')){const o=T[p++].v;a={t:'b',o,a,b:pPowOp()}}return a}
+ function pUn(){if(isO('-')||isO('+')||isO('~')||isO('!')){const o=T[p++].v;return{t:'u',o,a:pUn()}}return pPow()}
+ const pMul=bin(pUn,['*','/','.*','./','\\']),pAdd=bin(pMul,['+','-']);
+ function pRange(){const a=pAdd();if(isO(':')&&!(T[p+1]&&(T[p+1].v==')'||T[p+1].v==','))){p++;const b=pAdd();if(isO(':')){p++;return{t:'r',a,s:b,b:pAdd()}}return{t:'r',a,s:null,b}}return a}
+ const pCmp=bin(pRange,['==','~=','!=','<','>','<=','>=']),pBa=bin(pCmp,['&']),pBo=bin(pBa,['|']),pAnd=bin(pBo,['&&']),pOr=bin(pAnd,['||']);
+ const e=pOr();if(p<T.length)throw Error('Unexpected "'+T[p].v+'"');return e}
+
+/* ---------- statements ---------- */
+function split(src){const o=[];let cur='',d=0,q=null;
+ const push=show=>{const s=cur.trim();if(s)o.push({s,show});cur=''};
+ for(let i=0;i<src.length;i++){const ch=src[i];
+  if(q){cur+=ch;if(ch==q){if(src[i+1]==q)cur+=src[++i];else q=null}continue}
+  if(ch=='.'&&src.startsWith('...',i)){while(i<src.length&&src[i]!='\n')i++;continue}
+  if(ch=='%'){while(i<src.length&&src[i]!='\n')i++;i--;continue}
+  if((ch=="'"&&!/[\w)\]}'.]/.test(cur.slice(-1)||' '))||ch=='"'){q=ch;cur+=ch;continue}
+  if('([{'.includes(ch))d++;else if(')]}'.includes(ch))d--;
+  if(d<=0&&(ch==';'||ch==','||ch=='\n')){push(ch!=';');continue}
+  cur+=ch}
+ push(true);return o}
+const KW=['end','else','elseif','case','otherwise'];
+function simple(s,show){let m;
+ if((m=s.match(/^(hold|grid|axis|close|clear|clc|figure|format|clf)\b\s*(.*)$/))&&!/^[(=]/.test(m[2]))s=m[1]+'('+m[2].split(/\s+/).filter(Boolean).map(x=>"'"+x+"'").join(',')+')';
+ if(m=s.match(/^\[([\w\s,~]+)\]\s*=(?!=)\s*(.*)$/))return{k:'ma',v:m[1].split(/[\s,]+/).filter(Boolean),e:parse(m[2]),show};
+ if(m=s.match(/^([A-Za-z_]\w*)\s*(\(.*\))?\s*=(?!=)\s*(.*)$/))return{k:'as',n:m[1],ix:m[2]?parse(m[1]+m[2]).args:null,e:parse(m[3]),show};
+ return{k:'ex',e:parse(s),show,id:/^[A-Za-z_]\w*$/.test(s)?s:null}}
+function block(L,p,stops){const nodes=[];
+ while(p<L.length){const{s,show}=L[p],w=(s.match(/^[A-Za-z_]\w*/)||[''])[0];
+  if(stops.includes(w))return{nodes,p,w};
+  if(KW.includes(w))throw Error('Unexpected "'+w+'"');
+  p++;
+  if(w=='for'){const m=s.match(/^for\s*\(\s*(\w+)\s*=\s*(.*)\)$/)||s.match(/^for\s+(\w+)\s*=\s*(.*)$/);if(!m)throw Error('Invalid for statement');
+   const b=block(L,p,['end']);if(b.w!='end')throw Error("Missing 'end'");nodes.push({k:'for',v:m[1],e:parse(m[2]),b:b.nodes});p=b.p+1}
+  else if(w=='while'){const b=block(L,p,['end']);if(b.w!='end')throw Error("Missing 'end'");nodes.push({k:'while',e:parse(s.slice(5)),b:b.nodes});p=b.p+1}
+  else if(w=='if'){const cs=[];let el=null,cond=s.slice(2);
+   for(;;){const b=block(L,p,['elseif','else','end']);if(!b.w)throw Error("Missing 'end'");cs.push({c:parse(cond),b:b.nodes});p=b.p;
+    if(b.w=='elseif'){cond=L[p].s.slice(6);p++;continue}
+    if(b.w=='else'){const e=block(L,p+1,['end']);if(e.w!='end')throw Error("Missing 'end'");el=e.nodes;p=e.p+1}else p++;break}
+   nodes.push({k:'if',cs,el})}
+  else if(w=='switch'){const c=[];
+   for(;;){if(p>=L.length)throw Error("Missing 'end'");const h=L[p].s,hw=(h.match(/^[A-Za-z_]\w*/)||[''])[0];
+    if(hw=='end'){p++;break}if(hw!='case'&&hw!='otherwise')throw Error('Expected case, otherwise or end');
+    const b=block(L,p+1,['case','otherwise','end']);if(!b.w)throw Error("Missing 'end'");c.push(hw=='case'?{p:parse(h.slice(4)),b:b.nodes}:{def:1,b:b.nodes});p=b.p}
+   nodes.push({k:'sw',e:parse(s.slice(6)),c})}
+  else if(w=='break'||w=='continue')nodes.push({k:w});
+  else nodes.push(simple(s,show))}
+ return{nodes,p,w:null}}
+
+/* ---------- evaluator ---------- */
+let env,fig,out='',steps=0;const endS=[];
+const print=s=>{out+=s+'\n'};
+const newFig=()=>({axes:{},cur:1,g:[1,1]});
+const F={'+':(p,q)=>p+q,'-':(p,q)=>p-q,'.*':(p,q)=>p*q,'./':(p,q)=>p/q,'.^':Math.pow,'==':(p,q)=>+(p==q),'~=':(p,q)=>+(p!=q),'!=':(p,q)=>+(p!=q),'<':(p,q)=>+(p<q),'>':(p,q)=>+(p>q),'<=':(p,q)=>+(p<=q),'>=':(p,q)=>+(p>=q),'&':(p,q)=>+(!!p&&!!q),'|':(p,q)=>+(!!p||!!q)};
+const CMP=['==','~=','!=','<','>','<=','>=','&','|'];
+function tick(){if(++steps>300000)throw Error('Loop limit reached (possible infinite loop).')}
+function ev(a,E){switch(a.t){
+ case'n':return S(a.v);case's':return a.v;case'co':return':';
+ case'id':return E.has(a.n)?E.get(a.n):call(a.n,[],E);
+ case'end':{if(!endS.length)throw Error('"end" is only valid inside an index.');return S(endS[endS.length-1])}
+ case'm':return mat(a.rows.map(r=>r.map(x=>ev(x,E))));
+ case'cell':return a.items.map(x=>ev(x,E));
+ case'r':return rng(ev(a.a,E),a.s?ev(a.s,E):null,ev(a.b,E));
+ case'fn':return{fn:1,ps:a.ps,b:a.b,E};
+ case'fr':return{fn:1,ref:a.n};
+ case'tr':return tr(ev(a.a,E));
+ case'u':{const v=ev(a.a,E);return a.o=='-'?new M(v.r,v.c,v.d.map(x=>-x)):a.o=='+'?v:lg(new M(v.r,v.c,v.d.map(x=>+!x)))}
+ case'b':return binop(a,E);
+ case'c':{if(a.f.t=='id'&&!E.has(a.f.n))return call(a.f.n,a.args.map(x=>ev(x,E)),E);
+  const f=ev(a.f,E);return f&&f.fn?callFn(f,a.args.map(x=>ev(x,E))):index(f,a.args,E)}}
+ throw Error('Unsupported expression')}
+function callFn(f,a){if(f.ref)return call(f.ref,a,env);const E=new Map(f.E);f.ps.forEach((n,i)=>E.set(n,a[i]));return ev(f.b,E)}
+function call(n,a,E,multi){if(multi&&MO[n])return MO[n](...a);const f=BI[n];
+ if(!f){if(E.has(n)&&E.get(n).fn)return callFn(E.get(n),a);throw Error("Undefined function or variable '"+n+"'.")}
+ const r=f(...a);return Array.isArray(r)&&!multi?r[0]:r}
+function binop(a,E){const o=a.o;
+ if(o=='&&'||o=='||'){const x=tru(ev(a.a,E));return lg(S(+(o=='&&'?x&&tru(ev(a.b,E)):x||tru(ev(a.b,E)))))}
+ const x=ev(a.a,E),y=ev(a.b,E);
+ if(typeof x=='string'||typeof y=='string'){if(o=='=='&&typeof x==typeof y)return lg(S(+(x===y)));if(o=='~='||o=='!=')return lg(S(+(x!==y)));throw Error('Operation not supported for text.')}
+ if(F[o]){const r=bc(x,y,F[o]);if(CMP.includes(o))r.lg=1;return r}
+ if(o=='*')return mul(x,y);
+ if(o=='/')return y.d.length==1?bc(x,y,F['./']):mul(x,inv(y));
+ if(o=='\\')return x.d.length==1?bc(y,x,F['./']):mul(inv(x),y);
+ if(o=='^'){if(x.d.length==1&&y.d.length==1)return S(Math.pow(x.d[0],y.d[0]));
+  if(x.r==x.c&&y.d.length==1&&Number.isInteger(y.d[0])){const n=y.d[0],b=n<0?inv(x):x;let r=eye(x.r);for(let i=0;i<Math.abs(n);i++)r=mul(r,b);return r}
+  throw Error('Incorrect operands for ^')}
+ throw Error('Unsupported operator '+o)}
+function idx(a,E,len){if(a.t=='co')return{l:Array.from({length:len},(_,i)=>i+1),all:1};
+ endS.push(len);try{const v=ev(a,E);if(!(v instanceof M))throw Error('Invalid index.');return{l:v.lg?v.d.map((x,i)=>x?i+1:0).filter(Boolean):v.d,v}}finally{endS.pop()}}
+function index(m,args,E){if((m&&m.cell)||typeof m=='string'){const k=ev(args[0],E).d[0],A=m.cell||[...m];if(!(k>=1&&k<=A.length))throw Error('Index exceeds the number of array elements.');return A[k-1]}if(!(m instanceof M))throw Error('Cannot index into this value.');
+ const bad=()=>{throw Error('Index exceeds the number of array elements.')};
+ if(args.length==1){const{l,v,all}=idx(args[0],E,m.d.length),d=l.map(i=>{if(i<1||i>m.d.length||i%1)bad();return m.d[i-1]});
+  if(all)return new M(d.length,1,d);if(m.r==1&&m.c>1)return vec(d);if(m.c==1&&m.r>1)return new M(d.length,1,d);return v&&!v.lg?new M(v.r,v.c,d):new M(d.length,1,d)}
+ if(args.length==2){const a=idx(args[0],E,m.r).l,b=idx(args[1],E,m.c).l,d=[];
+  b.forEach(j=>a.forEach(i=>{if(i<1||j<1||i>m.r||j>m.c||i%1||j%1)bad();d.push(m.d[i-1+(j-1)*m.r])}));return new M(a.length,b.length,d)}
+ throw Error('Only 1-D and 2-D indexing is supported.')}
+function setIdx(m,args,v,E){if(!(v instanceof M))throw Error('Assignment needs a numeric value.');
+ if(args.length==1){const l=idx(args[0],E,m.d.length).l,mx=Math.max(0,...l);let R=m.r,C=m.c;
+  if(mx>m.d.length){if(!m.d.length||m.r==1){R=1;C=mx}else if(m.c==1){R=mx;C=1}else throw Error('Index exceeds matrix dimensions.')}
+  const d=m.d.slice();while(d.length<R*C)d.push(0);l.forEach((i,k)=>{d[i-1]=v.d.length==1?v.d[0]:v.d[k]});return new M(R,C,d)}
+ const a=idx(args[0],E,m.r).l,b=idx(args[1],E,m.c).l,R=Math.max(m.r,...a),C=Math.max(m.c,...b),d=new Array(R*C).fill(0);
+ for(let i=0;i<m.r;i++)for(let j=0;j<m.c;j++)d[i+j*R]=m.d[i+j*m.r];
+ if(v.d.length!=1&&v.d.length!=a.length*b.length)throw Error('Unable to perform assignment because the sizes do not match.');
+ let k=0;b.forEach(j=>a.forEach(i=>{d[i-1+(j-1)*R]=v.d.length==1?v.d[0]:v.d[k++]}));return new M(R,C,d)}
+function show(n,v){if(v&&v.cell)print(n+" = {"+v.cell.map(s=>"'"+s+"'").join(', ')+"}");else if(typeof v=='string')print(n+' = '+v);else if(v.d.length==1)print(n+' = '+fnum(v.d[0]));else print(n+' =\n\n'+fm(v)+'\n')}
+function exec(nodes){for(const n of nodes){const r=run1(n);if(r)return r}}
+function run1(n){tick();switch(n.k){
+ case'for':{const v=ev(n.e,env);const cols=v instanceof M?(v.r==1?v.d.map(x=>S(x)):Array.from({length:v.c},(_,j)=>new M(v.r,1,v.d.slice(j*v.r,(j+1)*v.r)))):[];
+  for(const x of cols){tick();env.set(n.v,x);if(exec(n.b)=='break')break}return}
+ case'while':while(tru(ev(n.e,env))){tick();if(exec(n.b)=='break')break}return;
+ case'if':for(const c of n.cs)if(tru(ev(c.c,env)))return exec(c.b);return n.el?exec(n.el):void 0;
+ case'sw':{const v=ev(n.e,env);let hit=null;
+  for(const c of n.c){if(c.def)continue;const pv=ev(c.p,env);
+   if((Array.isArray(pv)?pv:[pv]).some(q=>typeof v=='string'?q===v:q instanceof M&&q.d.length>0&&v.d[0]==q.d[0])){hit=c;break}}
+  hit=hit||n.c.find(c=>c.def);return hit?exec(hit.b):void 0}
+ case'break':case'continue':return n.k;
+ case'as':{const v=ev(n.e,env);if(n.ix)env.set(n.n,setIdx(env.get(n.n)||new M(0,0,[]),n.ix,v,env));else env.set(n.n,v);if(n.show)show(n.n,env.get(n.n));return}
+ case'ma':{const e=n.e,r=e.t=='c'&&e.f.t=='id'&&!env.has(e.f.n)?call(e.f.n,e.args.map(x=>ev(x,env)),env,true):[ev(e,env)];
+  n.v.forEach((nm,i)=>{if(nm!='~'&&r[i]!==undefined){env.set(nm,r[i]);if(n.show)show(nm,r[i])}});return}
+ case'ex':{const v=ev(n.e,env);if(v!=null&&!(v.fn)&&!Array.isArray(v)){if(!n.id)env.set('ans',v);if(n.show)show(n.id||'ans',v)}return}}}
+
+/* ---------- builtins ---------- */
+const BI={},MO={};
+const ew=f=>x=>new M(x.r,x.c,x.d.map(f));
+['sin','cos','tan','asin','acos','atan','sinh','cosh','tanh','exp','log','log10','log2','sqrt','abs','floor','ceil','round','fix','sign'].forEach(k=>BI[k]=ew(k=='fix'?Math.trunc:Math[k]));
+BI.factorial=ew(n=>{let r=1;for(let i=2;i<=n;i++)r*=i;return r});
+BI.pi=()=>S(Math.PI);BI.Inf=()=>S(Infinity);BI.NaN=()=>S(NaN);BI.eps=()=>S(2.220446049250313e-16);BI.true=()=>lg(S(1));BI.false=()=>lg(S(0));
+const fill=(a,b,f)=>{const r=a.d[0],c=b?b.d[0]:a.d.length>1?a.d[1]:r;return new M(r,c,Array.from({length:r*c},f))};
+BI.zeros=(a,b)=>fill(a,b,()=>0);BI.ones=(a,b)=>fill(a,b,()=>1);BI.rand=(a=S(1),b)=>fill(a,b,Math.random);BI.eye=a=>eye(a.d[0]);
+BI.linspace=(a,b,n=S(100))=>{const N=n.d[0],A=a.d[0],B=b.d[0];return vec(Array.from({length:N},(_,i)=>N==1?B:A+(B-A)*i/(N-1)))};
+BI.numel=m=>S(typeof m=='string'?m.length:m.d.length);BI.length=m=>S(typeof m=='string'?m.length:m.d.length?Math.max(m.r,m.c):0);
+BI.size=(m,k)=>k?S(k.d[0]==1?m.r:m.c):vec([m.r,m.c]);
+MO.size=m=>[S(m.r),S(m.c)];
+MO.meshgrid=(x,y)=>{y=y||x;const r=y.d.length,c=x.d.length,X=[],Y=[];for(let j=0;j<c;j++)for(let i=0;i<r;i++){X.push(x.d[j]);Y.push(y.d[i])}return[new M(r,c,X),new M(r,c,Y)]};
+BI.meshgrid=(...a)=>MO.meshgrid(...a)[0];
+const sm=a=>a.reduce((x,y)=>x+y,0);
+BI.sum=m=>red(m,sm);BI.prod=m=>red(m,a=>a.reduce((x,y)=>x*y,1));BI.mean=m=>red(m,a=>sm(a)/a.length);
+BI.max=(a,b)=>b?bc(a,b,Math.max):red(a,x=>Math.max(...x));BI.min=(a,b)=>b?bc(a,b,Math.min):red(a,x=>Math.min(...x));
+MO.max=m=>{const v=Math.max(...m.d);return[S(v),S(m.d.indexOf(v)+1)]};MO.min=m=>{const v=Math.min(...m.d);return[S(v),S(m.d.indexOf(v)+1)]};
+BI.cumsum=m=>{let s=0;return new M(m.r,m.c,m.d.map(x=>s+=x))};
+BI.sort=m=>new M(m.r,m.c,m.d.slice().sort((a,b)=>a-b));
+BI.mod=(a,b)=>bc(a,b,(x,y)=>y?x-Math.floor(x/y)*y:x);BI.rem=(a,b)=>bc(a,b,(x,y)=>x%y);BI.atan2=(a,b)=>bc(a,b,Math.atan2);
+BI.find=m=>{const d=[];m.d.forEach((x,i)=>x&&d.push(i+1));return m.c==1&&m.r>1?new M(d.length,1,d):vec(d)};
+BI.any=m=>lg(S(+m.d.some(x=>x)));BI.all=m=>lg(S(+m.d.every(x=>x)));BI.isempty=m=>lg(S(+(typeof m=='string'?!m.length:!m.d.length)));
+BI.transpose=tr;BI.inv=inv;BI.det=m=>S(det(m));BI.trace=m=>S(sm(Array.from({length:Math.min(m.r,m.c)},(_,i)=>m.d[i+i*m.r])));
+BI.diag=m=>{if(m.r==1||m.c==1){const n=m.d.length,o=new M(n,n,new Array(n*n).fill(0));m.d.forEach((x,i)=>o.d[i+i*n]=x);return o}return new M(Math.min(m.r,m.c),1,Array.from({length:Math.min(m.r,m.c)},(_,i)=>m.d[i+i*m.r]))};
+BI.disp=v=>{print(typeof v=='string'?v:v.d.length==1?fnum(v.d[0]):fm(v))};
+BI.fprintf=(...a)=>{if(a[0] instanceof M)a.shift();out+=fmt(a[0],a.slice(1))};
+BI.sprintf=(f,...a)=>fmt(f,a);
+BI.num2str=v=>{if(typeof v=='string')return v;const g=x=>Number.isInteger(x)?String(x):String(+x.toPrecision(5));return v.d.length==1?g(v.d[0]):v.d.map(g).join('  ')};
+BI.strcmp=(a,b)=>lg(S(+(a===b)));
+BI.error=(...a)=>{throw Error(fmt(a[0],a.slice(1)))};
+BI.clc=()=>{out=''};BI.clear=()=>{env.clear()};BI.format=()=>{};
+BI.figure=BI.clf=BI.close=()=>{fig=newFig()};
+
+/* ---------- graphics ---------- */
+const PAL=['#0072BD','#D95319','#EDB120','#7E2F8E','#77AC30','#4DBEEE','#A2142F'];
+const COL={r:'#E53935',g:'#2E9E4F',b:'#1F6FEB',c:'#00ACC1',m:'#D81B9A',y:'#F2B705',k:'__ink',w:'#FFFFFF'};
+const MK={'+':'cross-thin-open',o:'circle-open','*':'asterisk-open','.':'circle',x:'x-thin-open',s:'square-open',d:'diamond-open','^':'triangle-up-open',v:'triangle-down-open','>':'triangle-right-open','<':'triangle-left-open',p:'pentagon-open',h:'hexagon-open'};
+const PR={linewidth:'w',color:'c',markersize:'ms',displayname:'name'};
+const ax=()=>fig.axes[fig.cur]||(fig.axes[fig.cur]={s:[],title:'',xl:'',yl:'',zl:'',grid:0,xlim:null,ylim:null,eq:0,hold:0,leg:null});
+function spec(s){let c=null,mk=null,ls=null;
+ for(const[q,v]of[['--','dash'],['-.','dashdot'],[':','dot'],['-','solid']])if(s.includes(q)){ls=v;s=s.replace(q,'');break}
+ for(const ch of s){if(COL[ch])c=COL[ch];else if(MK[ch])mk=MK[ch]}return{c,mk,ls}}
+function trace(x,y,z,sp,pr,n){const col=pr.c?spec(pr.c).c:sp.c||ST.lc||PAL[n%7],mode=sp.mk&&!sp.ls?'markers':sp.mk?'lines+markers':'lines';
+ const t={type:z?'scatter3d':'scatter',mode,x,y,line:{color:col,dash:sp.ls||'solid',width:pr.w?+pr.w.d[0]:2},marker:{color:col,symbol:sp.mk||'circle',size:pr.ms?+pr.ms.d[0]:7}};if(z)t.z=z;if(pr.name)t.name=pr.name;return t}
+function plotArgs(A,is3){const a=ax();if(!a.hold)a.s=[];let i=0;
+ while(i<A.length){const nums=[];while(i<A.length&&A[i] instanceof M&&nums.length<(is3?3:2))nums.push(A[i++]);
+  if(!nums.length)throw Error('Expected numeric data.');
+  let sp={},pr={};if(typeof A[i]=='string'&&!PR[A[i].toLowerCase()])sp=spec(A[i++]);
+  while(typeof A[i]=='string'&&PR[A[i].toLowerCase()]){pr[PR[A[i].toLowerCase()]]=A[i+1];i+=2}
+  let x,y,z;
+  if(is3){if(nums.length<3)throw Error('plot3 needs x, y and z.');[x,y,z]=nums.map(m=>m.d)}
+  else if(nums.length==1){y=nums[0].d;x=y.map((_,k)=>k+1)}else{x=nums[0].d;y=nums[1].d}
+  if(x.length!=y.length||(z&&z.length!=x.length))throw Error('Vectors must be the same length.');
+  a.s.push(trace(x,y,z,sp,pr,a.s.length))}}
+BI.plot=(...a)=>{plotArgs(a,false)};BI.plot3=(...a)=>{plotArgs(a,true)};
+BI.scatter=(x,y)=>{const a=ax();if(!a.hold)a.s=[];a.s.push(trace(x.d,y.d,null,{mk:MK.o},{},a.s.length))};
+BI.fplot=(f,lim,...r)=>{const fn=typeof f=='string'?{fn:1,ps:['x'],b:parse(f),E:new Map()}:f;
+ const[lo,hi]=lim instanceof M?lim.d:[-5,5],N=300,xs=Array.from({length:N},(_,i)=>lo+(hi-lo)*i/(N-1));let ys;
+ try{const v=callFn(fn,[vec(xs)]);if(v.d.length!=N)throw 0;ys=v.d}catch(e){ys=xs.map(x=>callFn(fn,[S(x)]).d[0])}
+ plotArgs([vec(xs),vec(ys),...(typeof lim=='string'?[lim]:[]),...r],false);if(lim instanceof M&&lim.d.length>3){ax().xlim=lim.d.slice(0,2);ax().ylim=lim.d.slice(2,4)}};
+BI.bar=(x,y,c)=>{const a=ax();if(!a.hold)a.s=[];if(typeof y=='string'){c=y;y=null}const yy=y||x,xx=y?x.d:yy.d.map((_,i)=>i+1);a.s.push({type:'bar',x:xx,y:yy.d,marker:{color:(typeof c=='string'&&spec(c).c)||ST.lc||PAL[a.s.length%7]}})};
+BI.pie=v=>{const a=ax();a.s=[{type:'pie',values:v.d,labels:v.d.map(String),textinfo:'label+percent',sort:false}]};
+function surf(X,Y,Z){const a=ax();if(!a.hold)a.s=[];if(!Z){Z=X;X=vec(Array.from({length:Z.c},(_,j)=>j+1));Y=vec(Array.from({length:Z.r},(_,i)=>i+1))}
+ const xs=X.r==1||X.c==1?X.d:Array.from({length:X.c},(_,j)=>X.d[j*X.r]),ys=Y.r==1||Y.c==1?Y.d:Array.from({length:Y.r},(_,i)=>Y.d[i]);
+ a.s.push({type:'surface',x:xs,y:ys,z:rowsOf(Z),colorscale:'Viridis',showscale:false})}
+BI.surf=BI.mesh=surf;
+BI.xlabel=s=>{ax().xl=s};BI.ylabel=s=>{ax().yl=s};BI.zlabel=s=>{ax().zl=s};BI.title=s=>{ax().title=s};
+BI.legend=(...a)=>{ax().leg=a.filter(x=>typeof x=='string')};
+BI.grid=v=>{ax().grid=v=='off'?0:1};
+BI.hold=v=>{const a=ax();a.hold=v==='off'?0:v===undefined?+!a.hold:1};
+BI.xlim=m=>{ax().xlim=m.d.slice(0,2)};BI.ylim=m=>{ax().ylim=m.d.slice(0,2)};
+BI.axis=v=>{const a=ax();if(v instanceof M){a.xlim=v.d.slice(0,2);a.ylim=v.d.slice(2,4)}else if(v=='equal'||v=='square')a.eq=1;else if(v=='auto'||v=='normal'){a.eq=0;a.xlim=a.ylim=null}};
+BI.subplot=(m,n,p)=>{if(!n){const s=String(m.d[0]);m=S(+s[0]);n=S(+s[1]);p=S(+s[2])}fig.g=[m.d[0],n.d[0]];fig.cur=p.d[0]};
+
+BI.hist=(d,n)=>{const a=ax();if(!a.hold)a.s=[];const cs=n&&n.d.length>1?n.d:null,w=cs?cs[1]-cs[0]:0;a.s.push({type:'histogram',x:d.d,nbinsx:cs?undefined:n?n.d[0]:10,xbins:cs?{start:cs[0]-w/2,end:cs[cs.length-1]+w/2,size:w}:undefined,marker:{color:ST.lc||PAL[a.s.length%7],line:{color:'#fff',width:1}}})};
+BI.barh=(x,y)=>{const a=ax();if(!a.hold)a.s=[];const yy=y||x,xx=y?x.d:yy.d.map((_,i)=>i+1);a.s.push({type:'bar',orientation:'h',x:yy.d,y:xx,marker:{color:ST.lc||PAL[a.s.length%7]}})};
+BI.str2double=s=>S(typeof s=='string'?parseFloat(s):s.d[0]);BI.str2num=BI.str2double;
+const ask=p=>{const v=window.prompt(String(p),'');if(v===null)throw Error('Input cancelled.');return v};
+BI.input=(p,k)=>{const v=ask(p);if(k==='s')return v;try{return ev(parse(v),env)}catch(e){return v}};
+BI.inputdlg=p=>({cell:(Array.isArray(p)?p:[p]).map(ask)});
+BI.msgbox=(m,t)=>{showMsg(typeof m=='string'?m:fm(m),typeof t=='string'?t:'')};
+
+
+BI.median=m=>red(m,a=>{const s=a.slice().sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2});
+BI.std=m=>red(m,a=>{const mu=sm(a)/a.length;return a.length>1?Math.sqrt(sm(a.map(x=>(x-mu)**2))/(a.length-1)):0});
+BI.dot=(a,b)=>{if(a.d.length!=b.d.length)throw Error('Vectors must be the same length.');return S(sm(a.d.map((x,i)=>x*b.d[i])))};
+BI.cross=(a,b)=>{if(a.d.length!=3||b.d.length!=3)throw Error('Both vectors must have 3 elements.');const[x,y,z]=a.d,[u,v,w]=b.d;return new M(a.r,a.c,[y*w-z*v,z*u-x*w,x*v-y*u])};
+BI.flipud=m=>fromRows(rowsOf(m).reverse());BI.fliplr=m=>fromRows(rowsOf(m).map(r=>r.slice().reverse()));
+BI.triu=m=>fromRows(rowsOf(m).map((r,i)=>r.map((x,j)=>j>=i?x:0)));BI.tril=m=>fromRows(rowsOf(m).map((r,i)=>r.map((x,j)=>j<=i?x:0)));
+BI.real=m=>m;BI.imag=ew(()=>0);
+function eigv(m){if(m.r!=m.c)throw Error('Matrix must be square.');const n=m.r;let A=rowsOf(m);
+ const sym=A.every((r,i)=>r.every((x,j)=>Math.abs(x-A[j][i])<1e-12));
+ if(sym){for(let it=0;it<100;it++){let off=0,p=0,q=1;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(Math.abs(A[i][j])>off){off=Math.abs(A[i][j]);p=i;q=j}
+  if(off<1e-13)break;const th=(A[q][q]-A[p][p])/(2*A[p][q]),t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+  for(let k=0;k<n;k++){const a=A[k][p],b=A[k][q];A[k][p]=c*a-s*b;A[k][q]=s*a+c*b}
+  for(let k=0;k<n;k++){const a=A[p][k],b=A[q][k];A[p][k]=c*a-s*b;A[q][k]=s*a+c*b}}}
+ else{for(let it=0;it<2000;it++){const mu=A[n-1][n-1]+1e-9,B=A.map((r,i)=>r.map((x,j)=>x-(i==j?mu:0))),Q=[],R=Array.from({length:n},()=>new Array(n).fill(0));
+  for(let j=0;j<n;j++){let v=B.map(r=>r[j]);for(let k=0;k<j;k++){R[k][j]=sm(Q[k].map((x,i)=>x*B[i][j]));v=v.map((x,i)=>x-R[k][j]*Q[k][i])}
+   R[j][j]=Math.hypot(...v);Q.push(R[j][j]<1e-300?v.map(()=>0):v.map(x=>x/R[j][j]))}
+  const Qm=fromRows(Q.length?Q:[[0]]),Rm=fromRows(R),nx=rowsOf(mul(Rm,tr(Qm)));A=nx.map((r,i)=>r.map((x,j)=>x+(i==j?mu:0)))}
+  for(let i=1;i<n;i++)for(let j=0;j<i;j++)if(Math.abs(A[i][j])>1e-6)throw Error('Complex eigenvalues are not supported in this simulator.')}
+ return Array.from({length:n},(_,i)=>A[i][i]).sort((a,b)=>a-b)}
+BI.eig=m=>new M(m.r,1,eigv(m));
+BI.reshape=(m,r,c)=>{if(r.d[0]*c.d[0]!=m.d.length)throw Error('To RESHAPE the number of elements must not change.');return new M(r.d[0],c.d[0],m.d)};
+BI.isprime=ew(n=>{if(n<2||!Number.isInteger(n))return 0;for(let i=2;i*i<=n;i++)if(n%i==0)return 0;return 1});
+BI.and=(a,b)=>lg(bc(a,b,F['&']));BI.or=(a,b)=>lg(bc(a,b,F['|']));BI.not=a=>lg(new M(a.r,a.c,a.d.map(x=>+!x)));
+BI.ndims=m=>S(2);BI.randn=(a=S(1),b)=>fill(a,b,()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random()));
+BI.randperm=n=>{const a=Array.from({length:n.d[0]},(_,i)=>i+1);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return vec(a)};
+BI.primes=n=>vec(Array.from({length:Math.max(0,Math.floor(n.d[0])-1)},(_,i)=>i+2).filter(k=>{for(let i=2;i*i<=k;i++)if(k%i==0)return false;return true}));
+BI.factor=n=>{let v=n.d[0];const f=[];for(let p=2;p*p<=v;p++)while(v%p==0){f.push(p);v/=p}if(v>1||!f.length)f.push(v);return vec(f)};
+const g2=(x,y)=>{x=Math.abs(x);y=Math.abs(y);while(y)[x,y]=[y,x%y];return x};
+BI.gcd=(a,b)=>bc(a,b,g2);BI.lcm=(a,b)=>bc(a,b,(x,y)=>x&&y?Math.abs(x*y)/g2(x,y):0);
+MO.peaks=(n=S(49))=>{const N=n.d[0],t=Array.from({length:N},(_,i)=>-3+6*i/(N-1)),X=[],Y=[],Z=[];for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=t[j],y=t[i];X.push(x);Y.push(y);Z.push(3*Math.pow(1-x,2)*Math.exp(-x*x-Math.pow(y+1,2))-10*(x/5-Math.pow(x,3)-Math.pow(y,5))*Math.exp(-x*x-y*y)-Math.exp(-Math.pow(x+1,2)-y*y)/3)}return[new M(N,N,X),new M(N,N,Y),new M(N,N,Z)]};
+BI.peaks=(...a)=>MO.peaks(...a)[2];
+MO.sort=m=>{if(m.r==1||m.c==1){const ix=m.d.map((v,i)=>i).sort((a,b)=>m.d[a]-m.d[b]||a-b);return[new M(m.r,m.c,ix.map(i=>m.d[i])),new M(m.r,m.c,ix.map(i=>i+1))]}const V=[],I=[];for(let j=0;j<m.c;j++){const col=m.d.slice(j*m.r,(j+1)*m.r),ix=col.map((v,i)=>i).sort((a,b)=>col[a]-col[b]||a-b);V.push(...ix.map(i=>col[i]));I.push(...ix.map(i=>i+1))}return[new M(m.r,m.c,V),new M(m.r,m.c,I)]};
+BI.sort=m=>MO.sort(m)[0];
+BI.circshift=(m,k)=>{const sh=(i,s,n)=>((i-s)%n+n)%n;let sr=0,sc=0;if(k.d.length>1){sr=k.d[0];sc=k.d[1]}else if(m.r==1)sc=k.d[0];else sr=k.d[0];const d=new Array(m.d.length);for(let i=0;i<m.r;i++)for(let j=0;j<m.c;j++)d[i+j*m.r]=m.d[sh(i,sr,m.r)+sh(j,sc,m.c)*m.r];return new M(m.r,m.c,d)};
+BI.realmin=()=>S(2.2250738585072014e-308);BI.realmax=()=>S(Number.MAX_VALUE);BI.bitmax=()=>S(9007199254740991);
+BI.who=()=>{const k=[...env.keys()];print(k.length?'Your variables are:\n'+k.join('  '):'(workspace is empty)')};BI.whos=BI.who;
+/* any successful plotting call makes the Figure window pop up after the code finishes without errors */
+let plotted=0;
+['plot','plot3','scatter','fplot','bar','barh','pie','surf','mesh','hist'].forEach(n=>{const f=BI[n];BI[n]=(...a)=>{const r=f(...a);plotted=1;return r}});
+BI.text=(x,y,...r)=>{const a=ax(),s=r.find(q=>typeof q=='string');if(s!=null)(a.tx=a.tx||[]).push([x.d[0],y.d[0],s])};
+/* Canvas fallback: basic 2D line/marker/bar plots when Plotly cannot be loaded from any CDN. */
+function canvasFallback(el,emp){
+ const msg=lang=='ar'?'تعذر تحميل مكتبة Plotly من الإنترنت، لذا يُعرض رسم مبسط. تحقق من الاتصال ثم أعد تحميل الصفحة للحصول على الرسم الكامل.':'Plotly could not be loaded from the CDN. Showing a simplified canvas plot. Check your connection and reload for full figures.';
+ el.textContent='';emp.hidden=true;
+ const ks=Object.keys(fig.axes).map(Number).sort((a,b)=>a-b).filter(k=>fig.axes[k].s.length);
+ if(!ks.length){emp.hidden=false;emp.textContent=T[lang].empty+'\n\n'+msg;emp.style.whiteSpace='pre-wrap';return}
+ const cs=getComputedStyle(document.documentElement),ink=ST.tc||cs.getPropertyValue('--ink').trim(),gl=cs.getPropertyValue('--line').trim();
+ const note=document.createElement('div');note.textContent=msg;note.style.cssText='position:absolute;left:0;right:0;top:0;font-size:12px;color:#B42318;text-align:center;padding:2px 6px;z-index:1';
+ const cv=document.createElement('canvas'),W=el.clientWidth||600,H=el.clientHeight||400,dpr=window.devicePixelRatio||1;
+ cv.width=W*dpr;cv.height=H*dpr;cv.style.cssText='width:100%;height:100%;display:block';el.append(note,cv);
+ const g=cv.getContext('2d');g.scale(dpr,dpr);g.font='12px system-ui,sans-serif';
+ const[gm,gn]=fig.g,multi=ks.length>1,top=22;
+ ks.forEach(k=>{const A=fig.axes[k],row=Math.floor((k-1)/gn),col=(k-1)%gn,cw=W/(multi?gn:1),ch=(H-top)/(multi?gm:1);
+  const ox=(multi?col*cw:0)+52,oy=top+(multi?row*ch:0)+24,pw=cw-72,ph=ch-64;
+  g.fillStyle=ink;g.textAlign='center';g.fillText(A.title||'',ox+pw/2,oy-8);
+  const S=A.s.filter(s=>s.type=='scatter'||s.type=='bar'||s.type=='scatter3d');
+  if(!S.length){g.fillText(lang=='ar'?'(هذا النوع من الرسم يحتاج Plotly)':'(this plot type needs Plotly)',ox+pw/2,oy+ph/2);return}
+  let xs=[],ys=[];S.forEach(s=>{s.x.forEach(v=>xs.push(+v));s.y.forEach(v=>ys.push(+v))});
+  xs=xs.filter(isFinite);ys=ys.filter(isFinite);if(S.some(s=>s.type=='bar'))ys.push(0);
+  let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  if(A.xlim)[x0,x1]=A.xlim;if(A.ylim)[y0,y1]=A.ylim;if(x0==x1){x0-=1;x1+=1}if(y0==y1){y0-=1;y1+=1}
+  const X=v=>ox+(v-x0)/(x1-x0)*pw,Y=v=>oy+ph-(v-y0)/(y1-y0)*ph;
+  g.strokeStyle=gl;g.lineWidth=1;g.fillStyle=ink;
+  for(let t=0;t<=5;t++){const xv=x0+(x1-x0)*t/5,yv=y0+(y1-y0)*t/5;
+   if(A.grid){g.beginPath();g.moveTo(X(xv),oy);g.lineTo(X(xv),oy+ph);g.moveTo(ox,Y(yv));g.lineTo(ox+pw,Y(yv));g.stroke()}
+   g.textAlign='center';g.fillText(+xv.toPrecision(3),X(xv),oy+ph+14);g.textAlign='right';g.fillText(+yv.toPrecision(3),ox-5,Y(yv)+4)}
+  g.strokeStyle=ink;g.strokeRect(ox,oy,pw,ph);g.textAlign='center';g.fillText(A.xl||'',ox+pw/2,oy+ph+30);
+  g.save();g.translate(ox-40,oy+ph/2);g.rotate(-Math.PI/2);g.fillText(A.yl||'',0,0);g.restore();
+  g.save();g.beginPath();g.rect(ox,oy,pw,ph);g.clip();
+  S.forEach((s,i)=>{let c=(s.line&&s.line.color)||(s.marker&&s.marker.color)||'#0072BD';if(c=='__ink')c=ink;g.strokeStyle=g.fillStyle=c;g.lineWidth=(s.line&&s.line.width)||2;
+   if(s.type=='bar'){const bw=pw/Math.max(1,s.x.length)*.7;s.y.forEach((v,j)=>g.fillRect(X(s.x[j])-bw/2,Math.min(Y(v),Y(0)),bw,Math.abs(Y(v)-Y(0))));return}
+   if((s.mode||'lines').includes('lines')){g.setLineDash(s.line&&s.line.dash=='dash'?[7,4]:s.line&&s.line.dash=='dot'?[2,3]:[]);g.beginPath();s.x.forEach((v,j)=>j?g.lineTo(X(v),Y(s.y[j])):g.moveTo(X(v),Y(s.y[j])));g.stroke();g.setLineDash([])}
+   if((s.mode||'').includes('markers'))s.x.forEach((v,j)=>{g.beginPath();g.arc(X(v),Y(s.y[j]),3.5,0,7);g.fill()})});
+  g.restore()})}
+function render(){if($('mFig').hidden)return;const el=$('plot'),emp=$('empty');
+ if(typeof Plotly=='undefined'){if(window.plotlyState=='loading'){emp.hidden=false;emp.textContent=lang=='ar'?'جارٍ تحميل مكتبة الرسم...':'Loading plotting library...';return}canvasFallback(el,emp);return}
+ const ks=Object.keys(fig.axes).map(Number).sort((a,b)=>a-b).filter(k=>fig.axes[k].s.length);
+ if(!ks.length){Plotly.purge(el);emp.hidden=false;emp.textContent=T[lang].empty;return}
+ emp.hidden=true;
+ const cs=getComputedStyle(document.documentElement),ink=cs.getPropertyValue('--ink').trim(),gl=cs.getPropertyValue('--line').trim(),[gm,gn]=fig.g,multi=ks.length>1;
+ const L={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:ST.tc||ink,size:ST.fs},margin:{t:46,r:24,b:50,l:60},annotations:[],showlegend:false,barmode:'group'},TR=[];
+ ks.forEach(k=>{const A=fig.axes[k],sf=k==1?'':String(k),row=Math.floor((k-1)/gn),col=(k-1)%gn;
+  const dom=multi?{x:[col/gn+.06,(col+1)/gn-.02],y:[1-(row+1)/gm+.1,1-row/gm-.1]}:{x:[0,1],y:[0,1]};
+  const t3=A.s.some(s=>s.type=='surface'||s.type=='scatter3d'),pie=A.s.some(s=>s.type=='pie');
+  if(A.title)L.annotations.push({text:A.title,xref:'paper',yref:'paper',x:(dom.x[0]+dom.x[1])/2,y:Math.min(dom.y[1]+.015,1.04),yanchor:'bottom',showarrow:false,font:{size:ST.fs+2}});
+  (t3?[]:A.tx||[]).forEach(q=>L.annotations.push({x:q[0],y:q[1],text:q[2],xref:'x'+sf,yref:'y'+sf,showarrow:false,font:{size:ST.fs}}));
+  A.s.forEach((s,i)=>{const t={...s};
+   if(t.line&&t.line.color=='__ink')t.line={...t.line,color:ink};if(t.marker&&t.marker.color=='__ink')t.marker={...t.marker,color:ink};
+   if(A.leg&&A.leg[i]!=null){t.name=A.leg[i];L.showlegend=true}
+   if(pie)t.domain=dom;else if(t3)t.scene='scene'+sf;else{t.xaxis='x'+sf;t.yaxis='y'+sf}TR.push(t)});
+  if(t3){const ag={gridcolor:gl,showgrid:true};L['scene'+sf]={domain:dom,xaxis:{...ag,title:{text:A.xl}},yaxis:{...ag,title:{text:A.yl}},zaxis:{...ag,title:{text:A.zl}}}}
+  else if(!pie){const b={showgrid:!!A.grid,gridcolor:gl,zeroline:false,linecolor:ink,mirror:true,ticks:'outside'};
+   const X={...b,domain:dom.x,anchor:'y'+sf,title:{text:A.xl}},Y={...b,domain:dom.y,anchor:'x'+sf,title:{text:A.yl}};
+   if(A.xlim)X.range=A.xlim;if(A.ylim)Y.range=A.ylim;if(A.eq){Y.scaleanchor='x'+sf;Y.scaleratio=1}L['xaxis'+sf]=X;L['yaxis'+sf]=Y}});
+ Plotly.react(el,TR,L,{responsive:true,displaylogo:false})}
+
+/* ---------- command window UI & reference guide ---------- */
+const $=id=>document.getElementById(id);let lang='en';const ST={fs:14,lc:null,tc:null};
+const L=()=>lang=='ar'?1:0;
+const T={en:{title:'sajad matlap',foot:'Sajjad Abbas - Physics Department',figT:'Figure',theme:'Toggle theme',set:'Settings',conT:'Command window',cmdPh:'Enter command...',empty:'Type a command in the line below. Figures appear here.',appr:'Appearance',light:'Light',dark:'Dark',langL:'Language',typo:'System typography',typoN:'Menus, buttons and labels use your device’s standard system fonts.',fnS:'Function style',fsz:'Function font size',lc:'Line color',tc:'Text color',reset:'Reset',guide:'Review booklet (Lectures 1–7)',ok:'OK',scrT:'Script',scrPh:'Type several commands, one per line, then press Run (Ctrl+Enter)...',clr:'Clear',run:'Run',scr:'Script editor (multi-command)'},
+ar:{title:'sajad matlap',foot:'سجاد عباس - قسم الفيزياء',figT:'الرسم',theme:'تبديل المظهر',set:'الإعدادات',conT:'نافذة الأوامر',cmdPh:'اكتب الأمر هنا...',empty:'اكتب أمرًا في السطر السفلي. تظهر الرسوم هنا.',appr:'المظهر',light:'فاتح',dark:'داكن',langL:'اللغة',typo:'خطوط النظام',typoN:'القوائم والأزرار والعناوين تستخدم خطوط النظام القياسية في جهازك.',fnS:'تنسيق الدوال',fsz:'حجم خط الدوال',lc:'لون الخط',tc:'لون النص',reset:'إعادة',guide:'ملزمة المراجعة (المحاضرات 1–7)',ok:'حسنًا',scrT:'سكربت',scrPh:'اكتب عدة أوامر، أمرًا في كل سطر، ثم اضغط تشغيل (Ctrl+Enter)...',clr:'مسح',run:'تشغيل',scr:'محرر السكربت (عدة أوامر)'}};
+const NS=['\n(Reference only: not available in this simulator.)','\n(للمرجع فقط: غير متاح في هذا المحاكي.)'];
+/* each item: [title, English, Arabic, syntax/example] */
+const G=[
+{t:['Lecture 1: Introduction','المحاضرة 1: مقدمة'],i:[
+["What MATLAB is","MATLAB is a high-level technical computing language. Every variable is treated as a matrix; a single number is a 1×1 matrix.","ماتلاب لغة حوسبة تقنية عالية المستوى، وكل متغير يُعامل كمصفوفة؛ فالعدد المفرد مصفوفة 1×1.","x = 5\nsize(x)"],
+["Desktop windows","Command Window: where you type commands. Workspace: the variables in memory (type who). Current Folder: your files. Command History: earlier commands (press ↑ / ↓ in the command line).","نافذة الأوامر: تكتب فيها الأوامر. مساحة العمل: المتغيرات في الذاكرة (اكتب who). المجلد الحالي: ملفاتك. سجل الأوامر: الأوامر السابقة (اضغط ↑ / ↓ في سطر الأوامر).","who"],
+["clc and clear","clc clears the screen. clear removes all variables from memory.","الأمر clc يمسح الشاشة، والأمر clear يحذف كل المتغيرات من الذاكرة.","clc\nclear"],
+["; ... %","A semicolon ; hides the output of a command. Three dots ... continue a command on the next line. % starts a comment that MATLAB ignores.","الفاصلة المنقوطة ; تخفي ناتج الأمر. النقاط الثلاث ... تكمل الأمر في السطر التالي. وعلامة % تبدأ تعليقًا يتجاهله ماتلاب.","a = 3;      % no output\nb = 1 + 2 + ...\n    3"]]},
+{t:['Lecture 2: Variables & arithmetic','المحاضرة 2: المتغيرات والحساب'],i:[
+["Numerical constants","Integers (12), real numbers (3.75) and scientific notation (2.0E3 means 2000).","أعداد صحيحة (12) وحقيقية (3.75) وبالصيغة العلمية (2.0E3 تعني 2000).","2.0E3"],
+["Special constants","pi, realmin (smallest positive real), realmax (largest real) and bitmax (largest exact integer). The imaginary units i and j (√−1) belong to the course, but complex numbers are not simulated here."+NS[0],"pi وrealmin (أصغر عدد حقيقي موجب) وrealmax (أكبر عدد حقيقي) وbitmax (أكبر عدد صحيح دقيق). الوحدتان التخيليتان i وj (√−1) من المنهج، لكن الأعداد المركبة غير محاكاة هنا."+NS[1],"pi\nrealmax\nrealmin"],
+["String and logical constants","A string is text in single quotes. Logical constants are 1 (true) and 0 (false).","النص يُكتب بين علامتي اقتباس مفردتين. والثوابت المنطقية: 1 (صحيح) و0 (خطأ).","s = 'Hello'\nt = true\nf = false"],
+["Variable names","Names are case-sensitive (A and a differ), must start with a letter, can have up to 63 characters (letters, digits, _) and cannot be a reserved keyword such as for, if, end.","الأسماء حساسة لحالة الأحرف (A تختلف عن a)، وتبدأ بحرف، وحتى 63 خانة (حروف وأرقام و _)، ولا تكون كلمة محجوزة مثل for وif وend.","speed_1 = 20"],
+["Operator precedence","Order of evaluation: parentheses (), then power ^, then * / \\ , then + - . Equal levels go left to right.","ترتيب التنفيذ: الأقواس (), ثم الأس ^, ثم * / \\ , ثم + - . وعند التساوي من اليسار لليمين.","2 + 3*4^2\n(2 + 3)*4^2"],
+["Library functions","sqrt, abs, exp, log (natural), log10, sin, cos, tan, atan (angles in radians). real and imag extract parts of a number (complex numbers themselves are not simulated).","sqrt وabs وexp وlog (طبيعي) وlog10 وsin وcos وtan وatan (الزوايا بالراديان). والدالتان real وimag تستخرجان أجزاء العدد (الأعداد المركبة نفسها غير محاكاة).","sqrt(16)\nexp(1)\nlog10(1000)\nsin(pi/2)"],
+["Rounding, remainder, primes","fix (toward zero), floor (down), ceil (up), round (nearest). mod(a,b) and rem(a,b) give the remainder. isprime(n) returns 1 for a prime.","fix (نحو الصفر) وfloor (للأسفل) وceil (للأعلى) وround (الأقرب). وmod(a,b) وrem(a,b) تعطيان الباقي. وisprime(n) تعيد 1 للعدد الأولي.","fix(-2.7), floor(-2.7), ceil(-2.2), round(2.5)\nmod(10,3)\nisprime(7)"]]},
+{t:['Lecture 3: Arrays & matrices','المحاضرة 3: المصفوفات'],i:[
+["Row and column vectors","Row: square brackets with spaces or commas. Column: semicolons (or line breaks).","الصف: أقواس مربعة مع مسافات أو فواصل. العمود: فواصل منقوطة (أو أسطر جديدة).","r = [1 2 3]\nc = [1; 2; 3]"],
+["Uniform vectors","start:step:end builds evenly spaced values. The default step is 1. linspace(a,b,n) gives n points.","start:step:end ينشئ قيمًا متساوية البعد، والخطوة الافتراضية 1. وlinspace(a,b,n) تعطي n نقطة.","v = 0:0.5:2\nw = linspace(0,1,5)"],
+["Two-dimensional matrices","Type rows separated by semicolons.","اكتب الصفوف مفصولة بفواصل منقوطة.","A = [1 2 3; 4 5 6; 7 8 9]"],
+["Indexing and the colon","A(i,j) one element. A(n,:) row n. A(:,n) column n. A(m:n,p:q) a sub-matrix. end means the last index.","A(i,j) عنصر واحد. A(n,:) الصف n. A(:,n) العمود n. A(m:n,p:q) مصفوفة جزئية. وend تعني آخر فهرس.","A = [1 2 3; 4 5 6; 7 8 9];\nA(2,3)\nA(2,:)\nA(:,1)\nA(1:2,2:3)\nA(end,end)"],
+["Size and shape","length, size, numel, reshape(A,m,n), diag, transpose with ', sort, find.","length وsize وnumel وreshape(A,m,n) وdiag والمنقول بالرمز ' وsort وfind.","A = [1 2 3; 4 5 6; 7 8 9];\nsize(A)\nnumel(A)\nreshape(1:6,2,3)\nA'\nfind([0 3 0 5])"],
+["Statistics","mean, max, min, sum, median, std. On a matrix they work on each column.","mean وmax وmin وsum وmedian وstd. وعلى المصفوفة تعمل على كل عمود.","v = [4 8 1 9];\nmean(v), median(v), std(v)\nmax(v), min(v), sum(v)"],
+["Linear algebra","det, inv, trace, and A\\b to solve A x = b. eig gives the eigenvalues (real ones only here).","det وinv وtrace وA\\b لحل A x = b. والدالة eig تعطي القيم الذاتية (الحقيقية فقط هنا).","A = [2 1; 1 3];\ndet(A)\ninv(A)\ntrace(A)\neig(A)\nA\\[3; 5]"],
+["Vector products and manipulation","dot (scalar product), cross (vector product of two 3-element vectors), flipud / fliplr (flip), triu / tril (upper / lower triangle), circshift (rotate elements).","dot (الضرب القياسي) وcross (الضرب الاتجاهي لمتجهين من 3 عناصر) وflipud / fliplr (قلب) وtriu / tril (المثلث العلوي / السفلي) وcircshift (تدوير العناصر).","dot([1 2 3],[4 5 6])\ncross([1 0 0],[0 1 0])\nfliplr(1:4)\ncircshift(1:5,2)\ntriu([1 2;3 4])"]]},
+{t:['Lecture 4: Input & output','المحاضرة 4: الإدخال والإخراج'],i:[
+["input","x = input('prompt') reads a number. input('prompt','s') reads text. A box asks for the value.","x = input('prompt') تقرأ عددًا. وinput('prompt','s') تقرأ نصًا. وتظهر نافذة لإدخال القيمة.","n = input('Enter n: ');\nname = input('Name: ','s');"],
+["inputdlg","a = inputdlg('prompt') opens a dialog. The answer is text in a cell: a{1}. Convert with str2double.","a = inputdlg('prompt') تفتح نافذة إدخال، والإجابة نص داخل خلية: a{1}. وحوّلها بـ str2double.","a = inputdlg('Enter a number:');\nx = str2double(a{1})"],
+["disp","Shows a value or text without the variable name.","تعرض قيمة أو نصًا دون اسم المتغير.","disp('Result:')\ndisp([1 2; 3 4])"],
+["msgbox","Shows a pop-up message: msgbox('text','title').","تعرض رسالة منبثقة: msgbox('text','title').","msgbox('Done','Info')"],
+["fprintf","Formatted output. %d integer, %f decimal, %e scientific, %s text, \\n new line. %8.2f means width 8 with 2 decimals. The format repeats for vectors.","إخراج منسق: %d صحيح، %f عشري، %e علمي، %s نص، \\n سطر جديد. و%8.2f تعني عرض 8 برقمين عشريين. ويتكرر التنسيق مع المتجهات.","fprintf('%d squared = %d\\n', 4, 16)\nfprintf('pi = %.3f\\n', pi)\nfprintf('%s has %e\\n', 'x', 12345.6)"]]},
+{t:['Lecture 5: Logic & conditions','المحاضرة 5: المنطق والشروط'],i:[
+["Relational operators","< <= > >= == ~= compare values and return 1 (true) or 0 (false). Note: = assigns, == compares.","< <= > >= == ~= تقارن القيم وتعيد 1 (صحيح) أو 0 (خطأ). تنبيه: = للإسناد، و== للمقارنة.","3 > 2\n5 == 4\n7 ~= 8"],
+["Logical operators","& (AND), | (OR), ~ (NOT). The same as functions: and(a,b), or(a,b), not(a).","& (و) و| (أو) و~ (النفي). ولها دوال مكافئة: and(a,b) وor(a,b) وnot(a).","(3>2) & (5<4)\n(3>2) | (5<4)\n~(3>2)\nand(1,0), or(1,0), not(1)"],
+["if ... end","Runs the body only when the condition is true.","ينفذ الجسم فقط عندما يكون الشرط صحيحًا.","x = 5;\nif x > 3\n  disp('big')\nend"],
+["if ... else ... end","Chooses between two branches.","يختار بين مسارين.","if mod(4,2) == 0\n  disp('even')\nelse\n  disp('odd')\nend"],
+["if ... elseif ... else ... end","Tests conditions in order; the first true branch runs.","يختبر الشروط بالترتيب وينفذ أول مسار صحيح.","g = 72;\nif g >= 90\n  disp('A')\nelseif g >= 70\n  disp('B')\nelse\n  disp('C')\nend"],
+["switch ... case ... otherwise ... end","Compares one value with several cases. {a,b} matches either value. otherwise runs when nothing matches.","يقارن قيمة واحدة بعدة حالات. و{a,b} تطابق أيًّا من القيمتين. وotherwise تعمل عند عدم التطابق.","d = 3;\nswitch d\n  case 1\n    disp('one')\n  case {2,3}\n    disp('two or three')\n  otherwise\n    disp('other')\nend"]]},
+{t:['Lecture 6: Loops','المحاضرة 6: الحلقات'],i:[
+["for ... end","Repeats the body once for each value in the range.","يكرر الجسم مرة لكل قيمة في المدى.","s = 0;\nfor k = 1:10\n  s = s + k;\nend\ndisp(s)"],
+["Nested loops","A loop inside a loop. The inner loop completes for every step of the outer loop.","حلقة داخل حلقة. تكتمل الداخلية مع كل خطوة من الخارجية.","for i = 1:3\n  for j = 1:3\n    fprintf('%d ', i*j);\n  end\n  fprintf('\\n');\nend"],
+["while ... end","Repeats while the condition is true. The body must change something the condition depends on.","يكرر طالما الشرط صحيح. ويجب أن يغيّر الجسم ما يعتمد عليه الشرط.","n = 1;\nwhile n < 100\n  n = n*2;\nend\ndisp(n)"],
+["break","Leaves the loop immediately when a condition is met.","يخرج من الحلقة فورًا عند تحقق شرط.","for k = 1:10\n  if k > 4, break, end\n  disp(k)\nend"]]},
+{t:['Lecture 7: Plotting','المحاضرة 7: الرسم'],i:[
+["plot(x, y, spec)","2D plot. Line style: - (solid) -- (dashed) : (dotted) -. (dash-dot). Color: r g b c m y k w. Marker: + o * . x s d ^. Example spec: '--r*'.","رسم ثنائي الأبعاد. نمط الخط: - (متصل) -- (متقطع) : (منقط) -. (نقطة وشرطة). اللون: r g b c m y k w. العلامة: + o * . x s d ^. مثال: '--r*'.","x = 0:0.2:6;\nplot(x, sin(x), '--r*')"],
+["fplot","fplot('function', limits) plots a function over [xmin xmax]. A handle @(x) works too.","fplot('function', limits) يرسم دالة على [xmin xmax]. ويمكن استخدام @(x) أيضًا.","fplot('x.^2 - 2*x', [-2 4])"],
+["Multiple graphs","plot(x1,y1,x2,y2) draws several curves. hold on keeps the current plot; hold off releases it. subplot(m,n,p) makes an m-by-n grid and selects panel p.","plot(x1,y1,x2,y2) يرسم عدة منحنيات. وhold on يبقي الرسم الحالي وhold off يفكه. وsubplot(m,n,p) ينشئ شبكة m×n ويختار اللوحة p.","x = 0:0.1:2*pi;\nsubplot(2,1,1)\nplot(x, sin(x))\nsubplot(2,1,2)\nplot(x, cos(x), 'r')"],
+["Annotations","xlabel('x'), ylabel('y'), title('text'), grid on, legend('a','b'), text(x,y,'label'). Also xlim([a b]) and ylim([a b]).","xlabel('x') وylabel('y') وtitle('text') وgrid on وlegend('a','b') وtext(x,y,'label'). وكذلك xlim([a b]) وylim([a b]).","x = 0:0.1:6;\nplot(x, sin(x)); hold on\nplot(x, cos(x), '--')\nxlabel('x'); ylabel('y'); title('Waves')\ngrid on; legend('sin','cos')\ntext(1.5, 1, 'peak')"],
+["3D and special plots","plot3(x,y,z) 3D curve. [X,Y] = meshgrid(x,y) then surf(X,Y,Z) a surface. bar(y) vertical bars, barh(y) horizontal bars, hist(data,bins) histogram, pie(values) pie chart.","plot3(x,y,z) منحنى ثلاثي الأبعاد. [X,Y] = meshgrid(x,y) ثم surf(X,Y,Z) سطح. وbar(y) أعمدة رأسية وbarh(y) أفقية وhist(data,bins) مدرج تكراري وpie(values) مخطط دائري.","t = 0:0.1:6*pi;\nplot3(cos(t), sin(t), t)\n[X,Y] = meshgrid(-2:0.25:2);\nsurf(X, Y, X.*exp(-X.^2-Y.^2))\nbar([3 5 2 8]); barh([3 5 2 8])\nhist(rand(1,100), 8); pie([30 20 50])"]]}];
+const N0=NS[0],N1=NS[1];
+G[0].i.push(
+["Name, history, uses","MATLAB = Matrix laboratory (or mathematical laboratory). Cleve Moler (University of New Mexico) built it on the EISPACK and LINPACK Fortran libraries; Jack Little helped design it and founded MathWorks. Uses: control systems, digital signal and image processing, numerical methods, radar, robotics, electronics, communications.","MATLAB اختصار Matrix laboratory (المختبر الرياضي). طوّره كليف مولر (جامعة نيومكسيكو) فوق مكتبتي EISPACK وLINPACK بلغة فورتران، وساعد جاك ليتل في تصميمه وأسّس شركة MathWorks. تطبيقاته: أنظمة التحكم، معالجة الإشارة والصور، الطرائق العددية، الرادار، الروبوت، الإلكترونيات، الاتصالات.",""],
+["Script file (M-File)","In MATLAB: File > New > M-File (or Ctrl+N), then Run / F5; the file is saved with the extension .m. File names must not start with a digit, must not be an existing MATLAB command, and cannot contain spaces or symbols such as * & - +. Here: write several lines in the Script panel (opened with the Script button in the top bar) and press Run or Ctrl+Enter.","في MATLAB: File > New > M-File (أو Ctrl+N) ثم Run / F5، ويُحفظ الملف بالامتداد m. يجب ألا يبدأ اسم الملف برقم ولا يكون أمرًا موجودًا في ماتلاب ولا يحوي مسافات أو رموزًا مثل * & - +. هنا: اكتب عدة أسطر في نافذة السكربت المنبثقة (تُفتح بزر Script في الشريط العلوي) ثم اضغط Run أو Ctrl+Enter.","a = [1 2 3; 4 5 6]\nb = exp(a)"],
+["No declarations","Variables, constants and data types need no declaration. Commands are written in lowercase. Results appear in the Command Window.","لا حاجة للإعلان عن المتغيرات والثوابت وأنواع البيانات. تُكتب أوامر ماتلاب بحروف صغيرة، وتظهر النتائج في نافذة الأوامر.",""]);
+G[1].i.push(
+["Exponential notation","2×10^3 is written 2.0E3 (or 2.0E+3); −1.7×10^3 is −1.7E3; 4.7×10^−3 is 4.7E-3.","العدد 2×10^3 يُكتب 2.0E3 أو 2.0E+3، والعدد −1.7×10^3 يُكتب −1.7E3، والعدد 4.7×10^−3 يُكتب 4.7E-3.","2.0E3\n-1.7E3\n4.7E-3"],
+["Complex constants","Examples: sqrt(-2), 6+sin(0.5)j, c = 2-3i with i = j = √−1. real(c) gives 2 and imag(c) gives −3."+N0,"أمثلة: sqrt(-2) و 6+sin(0.5)j و c = 2-3i حيث i = j = √−1. الدالة real(c) تعطي 2 وimag(c) تعطي −3."+N1,""],
+["Reserved words and names","Not allowed as variable names: if, end, for, break, else, global, return, function, or built-in names such as sin and log. The letter l looks like the digit 1. Characters beyond 63 are ignored. Names may use letters, digits and _ only.","لا يجوز استخدام الكلمات المحجوزة كأسماء متغيرات: if وend وfor وbreak وelse وglobal وreturn وfunction، ولا أسماء الدوال مثل sin وlog. الحرف l يشبه الرقم 1. يُهمل ما زاد على 63 رمزًا. تتكون الأسماء من حروف وأرقام و _ فقط.",""],
+["Writing algebra in MATLAB","a−3b is a-3*b; c²−10 is c^2-10; (a²+b²)/12 is (a^2+b^2)/12; M(7d−8g) is M*(7*d-8*g). Parentheses first, then ^, then * /, then + −, left to right. A/B+C is not A/(B+C).","a−3b تُكتب a-3*b، وc²−10 تُكتب c^2-10، و(a²+b²)/12 تُكتب (a^2+b^2)/12، وM(7d−8g) تُكتب M*(7*d-8*g). الأقواس أولًا ثم ^ ثم * / ثم + − من اليسار لليمين. والتعبير A/B+C يختلف عن A/(B+C).","a=2; b=3;\na-3*b\n(a^2+b^2)/12\n6/2+1\n6/(2+1)"],
+["Order of steps","A-B/(K*F-X^M) runs as: 1) X^M  2) K*F  3) K*F − X^M  4) B / result  5) A − result. Functions run before outer operators: sin(a+b)-m/sqrt(d).","التعبير A-B/(K*F-X^M) ينفذ: 1) X^M 2) K*F 3) طرح الناتجين 4) قسمة B على الناتج 5) طرحه من A. وتُنفذ الدوال قبل العمليات خارجها: sin(a+b)-m/sqrt(d).","A=10; B=8; K=2; F=3; X=2; M=2;\nA-B/(K*F-X^M)"],
+["Arithmetic and string statements","Arithmetic statement: variable = expression. String statement: text in single quotes; single quotes cannot be placed inside the quotes.","الجملة الحسابية: متغير = تعبير حسابي. الجملة الرمزية: نص بين علامتي اقتباس مفردتين ولا يجوز وضع اقتباس مفرد داخلهما.","R = 2;\nA = 3.14*R^2\nDept = 'Computer Science'"],
+["Rounding and number functions","With x = 2.6 and y = −2.6: fix gives 2 / −2, floor 2 / −3, ceil 3 / −2, round 3 / −3. primes(n) lists primes, factor(n) gives prime factors, gcd and lcm give the greatest common divisor and least common multiple, sign gives the sign.","عند x = 2.6 وy = −2.6: الدالة fix تعطي 2 و −2، وfloor تعطي 2 و −3، وceil تعطي 3 و −2، وround تعطي 3 و −3. وprimes(n) تسرد الأعداد الأولية وfactor(n) عواملها الأولية وgcd وlcm القاسم المشترك الأكبر والمضاعف المشترك الأصغر وsign الإشارة.","x=2.6; y=-2.6;\nfix(x), fix(y)\nfloor(x), floor(y)\nceil(x), ceil(y)\nround(x), round(y)\nprimes(20)\nfactor(60)\ngcd(12,18), lcm(4,6)"],
+["Translating formulas","b=√(a²+10): b = sqrt(a^2+10). z=ln(cx+ny): z = log(c*x+n*y). y=sin³(x+nk): y = (sin(x+n*k))^3. s=tan⁻¹(y/x): s = atan(y/x). t=|x−√y|/(a+m): t = abs(x-sqrt(y))/(a+m).","b=√(a²+10) تُكتب b = sqrt(a^2+10)، وz=ln(cx+ny) تُكتب z = log(c*x+n*y)، وy=sin³(x+nk) تُكتب y = (sin(x+n*k))^3، وs=tan⁻¹(y/x) تُكتب s = atan(y/x)، وt=|x−√y|/(a+m) تُكتب t = abs(x-sqrt(y))/(a+m).","x=4; y=9; a=1; m=2;\nt = abs(x-sqrt(y))/(a+m)\ns = atan(y/x)"]);
+G[2].i.push(
+["Steps and negative steps","[1:2:13], [1.5:0.1:2.1], [-3:7] (step omitted = 1) and [21:-3:6] (negative step).","[1:2:13] و[1.5:0.1:2.1] و[-3:7] (الخطوة المحذوفة = 1) و[21:-3:6] (خطوة سالبة).","x = [1:2:13]\nz = [-3:7]\nxa = [21:-3:6]"],
+["Matrices with expressions","Elements can be expressions of existing variables. An m×n matrix has m rows and n columns.","يمكن أن تكون العناصر تعابير رياضية لمتغيرات معرّفة. المصفوفة m×n فيها m من الصفوف وn من الأعمدة.","cd=6; e=3; h=4;\nMat = [e, cd*h, cos(pi/3); h^2, sqrt(h*h/cd), 14]"],
+["Reading and changing elements","v(k) is element k; ma(m,n) is row m, column n. Assigning to an address changes that element, and elements can be used in expressions.","v(k) العنصر k، وma(m,n) العنصر في الصف m والعمود n. التعيين على عنوان يغيّر ذلك العنصر، ويمكن استخدام العناصر في التعابير.","v = [35 46 78 23 5 14 81 3 55];\nv(4)\nv(4) = 2\nma = [2 3 5;6 8 9;0 8 4];\nma(2,3) = 15\nv(2)+v(8)"],
+["Colon forms","va(:) all elements; va(m:n) elements m to n; A(:,n) column n; A(n,:) row n; A(:,m:n) columns; A(m:n,:) rows; A(m:n,p:q) a block. A(:) turns a matrix into one column.","va(:) كل العناصر، وva(m:n) من m إلى n، وA(:,n) العمود n، وA(n,:) الصف n، وA(:,m:n) أعمدة، وA(m:n,:) صفوف، وA(m:n,p:q) كتلة جزئية. وA(:) تحول المصفوفة إلى عمود واحد.","A=[1 3 5 7 9 11; 2 4 6 8 10 12; 3 6 9 12 15 18; 4 8 12 16 20 24];\nB = A(:,3)\nC = A(2,:)\nE = A(2:3,:)\nF = A(1:3,2:4)"],
+["Sorting","sort(A) sorts ascending; [y,indx]=sort(A) also gives the original positions; randperm(n) gives a random order of 1..n.","sort(A) ترتب تصاعديًا، و[y,indx]=sort(A) تعطي أيضًا المواقع الأصلية، وrandperm(n) ترتيب عشوائي للأعداد 1..n.","A=[7 5 2 1 3 6 4 8];\n[y,indx] = sort(A)\nrandperm(8)"],
+["find with a condition","find gives positions where the condition is true; [i,j]=find(A>6) gives rows and columns. Use the positions to pick values.","تعيد find مواقع العناصر التي تحقق الشرط، وتعطي [i,j]=find(A>6) الصفوف والأعمدة. استخدم المواقع لاستخراج القيم.","x = -3:3;\nk = find(abs(x) > 1)\ny = x(k)\nA = [1 2 3;4 5 6;7 8 9];\n[i,j] = find(A > 6)"],
+["Analysis functions","max(A) per column; [d,n]=max(A) value and position; max(A') per row; max(max(A)) overall. min, sum, median, std and mean work the same way.","max(A) لكل عمود، و[d,n]=max(A) القيمة وموقعها، وmax(A') لكل صف، وmax(max(A)) الأكبر في المصفوفة. وكذلك min وsum وmedian وstd وmean.","A = [1 2 3; 4 5 2; 7 0 9];\nmax(A)\nmax(A')\nmax(max(A))\n[d,n] = max([5 9 2 4 11 6 11 1])\nmin(A'), sum(A'), sum(sum(A))\nmean(A), median(A), std(A)"],
+["Matrix tools","ndims(A) dimensions; numel(A) elements; eig(A) eigenvalues; trace(A) diagonal sum; inv(A) inverse; det(A) determinant; flipud / fliplr flip; triu / tril triangles.","ndims(A) عدد الأبعاد، وnumel(A) عدد العناصر، وeig(A) القيم الذاتية، وtrace(A) مجموع القطر، وinv(A) المعكوس، وdet(A) المحدد، وflipud / fliplr للقلب، وtriu / tril للمثلثين.","A = [1 2 3; 4 5 6; 7 8 9];\nndims(A)\nflipud(A)\nfliplr(A)\ntriu(A)\ntril(A)\ntrace(A)"],
+["circshift","circshift(a,n) moves rows down by n (up if negative); circshift(a,[r c]) moves rows by r and columns by c; elements wrap around.","circshift(a,n) تزيح الصفوف للأسفل بمقدار n (للأعلى إن كان سالبًا)، وcircshift(a,[r c]) تزيح الصفوف بمقدار r والأعمدة بمقدار c، وتعود العناصر من الطرف الآخر.","a = [1 2 3; 4 5 6; 7 8 9];\ncircshift(a,1)\ncircshift(a,-1)\ncircshift(a,[1 -1])\ncircshift(a,[0 1])"]);
+G[3].i.push(
+["input for vectors","When prompted, type [ then the elements to enter a vector or matrix. 'input(...,'s')' keeps the text as typed.","عند ظهور الرسالة اكتب [ ثم العناصر لإدخال متجه أو مصفوفة. والصيغة input(...,'s') تحفظ النص كما كُتب.","v = input('Enter vector: ')\nz = input('Enter z: ','s')"],
+["inputdlg in full","inputdlg(prompt, dlgTitle, lineNo, def): prompt and def are cells and lineNo is the number of lines. The answer is a cell of text; convert with str2num.","الصيغة inputdlg(prompt, dlgTitle, lineNo, def): prompt وdef خلايا وlineNo عدد السطور. الإجابة خلية نصية تُحوَّل برقم بـ str2num.","prompt = {'enter x'};\ndef = {'20'};\nanswer = inputdlg(prompt,'Input for my program',1,def);\nx = str2num(answer{1})"],
+["disp with text and numbers","Everything inside one disp must be the same type; to mix text and numbers convert with num2str and group in []. disp can show a table: headings, an empty line, then the array.","يجب أن تكون محتويات disp الواحدة من نوع واحد، ولدمج النص مع الأرقام حوّل الرقم بـ num2str وضعها بين []. ويمكن عرض جدول: العناوين ثم سطر فارغ ثم المصفوفة.","s = 9.8;\ndisp(['sum=', num2str(s)])\nyr=[1984 1986 1988]; pop=[127 130 136];\nT = [yr' pop'];\ndisp('   YEAR   POPULATION')\ndisp(' ')\ndisp(T)"],
+["fprintf formats","%d or %i integer, %f fixed point, %e exponent, %c character, %s text, %o octal, %x hexadecimal. %6.3f means width 6 with 3 decimals; \\n starts a new line. A matrix is read column by column and the format repeats.","%d أو %i صحيح، %f عشري، %e أسّي، %c رمز، %s نص، %o ثماني، %x سداسي عشري. و%6.3f عرض 6 وثلاث مراتب عشرية، و\\n سطر جديد. تُقرأ المصفوفة عمودًا بعد عمود ويتكرر التنسيق.","x=1:5; y=sqrt(x);\nT=[x; y];\nfprintf('If the number is: %i, its square root is: %f\\n',T)"],
+["Practice: wind chill","Twc = 35.74 + 0.6215T − 35.75V^0.16 + 0.4275TV^0.16 (T in °F, V in mi/h). Read T and V, then print the rounded result.","Twc = 35.74 + 0.6215T − 35.75V^0.16 + 0.4275TV^0.16 حيث T بالفهرنهايت وV بالميل/ساعة. اقرأ T وV ثم اطبع الناتج مقربًا لأقرب عدد صحيح.","T = input('T (F): ');\nV = input('V (mi/h): ');\nTwc = 35.74+0.6215*T-35.75*V^0.16+0.4275*T*V^0.16;\nfprintf('The wind chill temperature is: %d\\n', round(Twc))"]);
+G[4].i.push(
+["Comparing arrays","Relational operators compare equal-size arrays, or an array with one number (each element is compared). The result is a logical array of 1s and 0s that can pick elements: r(A) keeps the places where A is 1.","تقارن المعاملات العلائقية مصفوفتين متساويتي الحجم أو مصفوفة مع عدد مفرد (يقارن كل عنصر). الناتج متجه منطقي من 0 و1 يمكن استخدامه لانتقاء العناصر: r(A) تبقي المواقع التي قيمتها 1.","r = [2 4 7 9 0 1 3];\nA = r <= 4\nB = r(A)"],
+["Logical examples","& gives 1 only if both are nonzero; | gives 1 if at least one is; ~ flips. They work inside math too: 25+((12&0)+(~0)*(0|5)) = 50.","المعامل & يعطي 1 فقط إذا كان الطرفان غير صفريين، و| يعطي 1 إذا كان أحدهما كذلك، و~ يعكس. وتعمل داخل التعابير الرياضية: 25+((12&0)+(~0)*(0|5)) = 50.","3 & 7\na = 5 | 0\n~25\nt = 25+((12&0)+(~0)*(0|5))\nx=[9 3 0 11 0 15]; y=[2 0 13 0 11 4];\nx&y\nx|y\n~(x+y)"],
+["Operator precedence","Highest to lowest: parentheses; power ^ and transpose '; unary minus and ~; * / ; + - ; colon : ; relational < <= > >= == ~= ; & ; | .","من الأعلى للأدنى: الأقواس، ثم الأس ^ والمدور '، ثم الإشارة والنفي ~، ثم * /، ثم + -، ثم النقطتان :، ثم العلائقية < <= > >= == ~=، ثم & ثم |.","x = 4;\n-5 < x & x < 7"],
+["Practice: graduation units","Print the department for the entered credit units: Physics 145, Chemistry 143, Earth Science 140, Life Science 141, Mathematics 138. Only the first matching case runs; otherwise runs when none match.","اطبع اسم القسم حسب وحدات التخرج: فيزياء 145، كيمياء 143، علم الأرض 140، علوم الحياة 141، رياضيات 138. تُنفذ أول حالة تتطابق فقط، وتُنفذ otherwise عند عدم التطابق.","u = 145;\nswitch u\n  case 145\n    disp('Physics')\n  case 143\n    disp('Chemistry')\n  case 140\n    disp('Earth Science')\n  case {141,138}\n    disp('Life Science or Mathematics')\n  otherwise\n    disp('No match')\nend"]);
+G[5].i.push(
+["for loop notes","for k = f:s:t: f first value, s step (default 1, may be negative), t last value. If f = t it runs once; if s>0 and f>t (or s<0 and f<t) it never runs. The index may be a list such as k=[4 8 -9 0 7]. Do not change k inside the loop; remove ; to see values.","for k = f:s:t: القيمة الأولى f والزيادة s (الافتراضي 1 ويمكن أن تكون سالبة) والأخيرة t. إذا كانت f = t تنفذ مرة واحدة، وإذا كانت s>0 وf>t (أو s<0 وf<t) فلا تنفذ. ويمكن أن يكون المتغير قائمة مثل k=[4 8 -9 0 7]. لا تغيّر k داخل الحلقة، وأزل ; لعرض القيم.","for k = 1:3:10\n  x = k^2\nend"],
+["Series sum","Sum of (−1)^k · k / 2^k for k = 1..n. Run it with n = 4 and n = 20.","مجموع المتسلسلة (−1)^k · k / 2^k من k = 1 إلى n. نفّذها عند n = 4 وn = 20.","n = input('Enter the number of terms ');\nS = 0;\nfor k = 1:n\n  S = S + (-1)^k*k/2^k;\nend\nfprintf('The sum of the series is: %f\\n', S)"],
+["Nested loops","The outer loop runs one pass, then the inner loop completes; this repeats. Example 1: multiplication table. Example 2: first row = column number, first column = row number, others = element above + element on the left.","تعمل الحلقة الخارجية دورة واحدة ثم تكتمل الداخلية، ويتكرر ذلك. المثال 1: جدول الضرب. المثال 2: الصف الأول رتبة العمود، والعمود الأول رتبة الصف، وباقي العناصر مجموع العنصر الذي فوقه والذي على يساره.","for i = 1:10\n  for j = 1:10\n    mult(i,j) = i*j;\n  end\nend\ndisp(mult)\nn = 4; m = 5; A = [];\nfor k = 1:n\n  for h = 1:m\n    if k == 1\n      A(k,h) = h;\n    elseif h == 1\n      A(k,h) = k;\n    else\n      A(k,h) = A(k,h-1) + A(k-1,h);\n    end\n  end\nend\nA"],
+["while examples","Runs while the condition is 1 (true) and stops when it is 0. Example 1: x doubles until it passes 15. Example 2: print a vector until a negative number.","تنفذ طالما الشرط 1 (صحيح) وتتوقف عندما يصبح 0. المثال 1: يتضاعف x حتى يتجاوز 15. المثال 2: طباعة عناصر متجه حتى أول عدد سالب.","x = 1\nwhile x <= 15\n  x = 2*x\nend\nv = [4 5 1 3 -2 10 4];\ni = 1;\nwhile v(i) > 0\n  disp(v(i))\n  i = i+1;\nend"],
+["break in for and while","break leaves the loop when a condition is met; in nested loops it leaves only the loop that contains it. Results: for version i = 22, s = 253; while version x = 51, s = 286.","تخرج break من الحلقة عند تحقق الشرط، وفي الحلقات المتداخلة تخرج من الحلقة التي تحتويها فقط. النتائج: في for تكون i = 22 وs = 253، وفي while تكون x = 51 وs = 286.","s = 0;\nfor i = 1:100\n  s = s + i;\n  if s > 250\n    break\n  end\nend\ni, s\ns = 0; x = 1;\nwhile x < 100\n  s = s + x;\n  if s > 250\n    break\n  end\n  x = x + 5;\nend\nx, s"],
+["Practice: counting","Print 10 down to 1 in steps of −2, then 0 up to 10 in steps of 2.","اطبع الأعداد من 10 إلى 1 بتناقص 2، ثم من 0 إلى 10 بزيادة 2.","for k = 10:-2:1\n  disp(k)\nend\nfor k = 0:2:10\n  disp(k)\nend"]);
+G[6].i.push(
+["Line properties","plot(x,y,'--r*','linewidth',2,'markersize',12) sets width and marker size. The default colour is blue.","الصيغة plot(x,y,'--r*','linewidth',2,'markersize',12) تحدد سمك الخط وحجم العلامة. اللون الافتراضي أزرق.","yr = 1988:1994;\nsle = [8 12 20 22 18 24 27];\nplot(yr,sle,'--r*','linewidth',2,'markersize',12)"],
+["Plotting a function","Build x for the domain, compute y with element-by-element operators (.* ./ .^), then plot(x,y). fplot('function',limits,'spec') takes [xmin xmax] or [xmin xmax ymin ymax].","أنشئ المتجه x للمجال ثم احسب y بعمليات عنصر بعنصر (.* ./ .^) ثم plot(x,y). والصيغة fplot('function',limits,'spec') تأخذ [xmin xmax] أو [xmin xmax ymin ymax].","x = -2:0.01:4;\ny = 3.5.^(-0.5*x).*cos(6*x);\nplot(x,y)\n% or: fplot('x^2+4*sin(2*x)-1',[-3 3])"],
+["Several curves","plot(x,y,u,v,t,h): x,u,t on the horizontal axis and y,v,h on the vertical; each pair must have equal length. Example: y = 3x³ − 26x + 10 with its first and second derivatives.","plot(x,y,u,v,t,h): المتجهات x,u,t على المحور الأفقي وy,v,h على العمودي، ويجب تساوي طول كل زوج. مثال: الدالة y = 3x³ − 26x + 10 ومشتقتاها الأولى والثانية.","x = -2:0.01:4;\ny = 3*x.^3 - 26*x + 10;\nyd = 9*x.^2 - 26;\nydd = 18*x;\nplot(x,y,'-b',x,yd,'--r',x,ydd,':k')\nlegend('y','dy/dx','d2y/dx2')\ngrid on"],
+["3D curves and surfaces","plot3(x,y,z) takes three coordinates; zlabel names the z axis. [x y z]=peaks(30) builds a sample surface for surf(x,y,z).","الصيغة plot3(x,y,z) تأخذ ثلاثة إحداثيات، وzlabel تسمي المحور z. والصيغة [x y z]=peaks(30) تنشئ سطحًا نموذجيًا للرسم بـ surf(x,y,z).","t = linspace(0,10*pi,100);\nplot3(sin(t),cos(t),t)\nxlabel('sin(t)'); ylabel('cos(t)'); zlabel('t')\ngrid on\n% then try: [x y z] = peaks(30); surf(x,y,z)"],
+["bar, barh, hist, pie","bar(x,y,'r') vertical bars with colour; barh(x,y) horizontal; hist(y,x) histogram with bin centres x; pie(x) pie chart.","bar(x,y,'r') أعمدة رأسية بلون، وbarh(x,y) أفقية، وhist(y,x) مدرج تكراري مراكز فئاته x، وpie(x) مخطط دائري.","yr = 1988:1994; sle = [8 12 20 22 18 24 27];\nbar(yr,sle,'r')\nxlabel('Year'); ylabel('Sales (Millions)')\n% try: barh(yr,sle)  hist(randn(10000,1), -2.9:0.1:2.9)  pie([11 18 26 9 5])"],
+["subplot example","subplot(m,n,p) makes an m-by-n grid of plots; p counts row by row. axis([xmin xmax ymin ymax]) sets the limits.","الصيغة subplot(m,n,p) تنشئ شبكة رسوم m×n وتعد p صفًا بعد صف. وaxis([xmin xmax ymin ymax]) تحدد الحدود.","x = linspace(0,2*pi,30);\nsubplot(2,2,1); plot(x,sin(x)); axis([0 2*pi -1 1]); title('Figure1')\nsubplot(2,2,2); plot(x,cos(x)); axis([0 2*pi -1 1]); title('Figure2')\nsubplot(2,2,3); plot(x,2*sin(x).*cos(x)); title('Figure3')\nsubplot(2,2,4); plot(x,sin(x)./(cos(x)+eps)); axis([0 2*pi -20 20]); title('Figure4')"]);
+/* ---------- review booklet: symbol-by-symbol explanations (Arabic, course material) ---------- */
+const BK=[
+{o:`ماتلاب (MATLAB) اختصار Matrix Laboratory، وهي لغة عالية المستوى للحسابات والبرمجة تعتمد على المصفوفة كشكل أساسي لتخزين البيانات؛ فكل متغير مصفوفة حتى لو كان عددًا مفردًا (Scalar). تُستخدم في الحسابات الرياضية، وتحليل البيانات، والرسوم العلمية، ومعالجة الإشارة والصور، وأنظمة التحكم.`,r:[
+[`ما هو MATLAB`,`اسمه اختصار Matrix laboratory أو mathematical laboratory (المختبر المصفوفي أو الرياضي). تعتمد لغته على تنسيق البيانات في صورة مصفوفة، وكل متغير مصفوفة حتى لو كان عددًا مفردًا Scalar.`],
+[`نبذة تاريخية`,`في منتصف السبعينات طوّر كليف مولر (رئيس قسم الحاسوب في جامعة نيومكسيكو) مكتبتي الفورتران EISPACK و LINPACK لحسابات المصفوفات، وكتب برنامجًا للوصول إليهما وسماه MATLAB. وساعده جاك ليتل في تخطيط البرنامج، وهو مؤسس شركة MathWorks.`],
+[`تطبيقات MATLAB`,`أنظمة التحكم، معالجة الإشارة الرقمية، النظريات العددية التقريبية، معالجة الصور، الرادار، الروبوت، الإلكترونيات، الاتصالات.`],
+[`تشغيل البرنامج`,`إما بالنقر المزدوج Double Click على أيقونة البرنامج على سطح المكتب، أو من القائمة Start ثم Program ثم MATLAB. تظهر شاشة باسم البرنامج ونسخة الإصدار، ثم النافذة الرئيسية.`],
+[`مكونات النافذة الرئيسية`,`1) شريط العنوان: يحمل رمز البرنامج واسمه. 2) شريط القوائم Menu Bar: من File إلى Help. 3) شريط الأدوات Tools Bar: رموز لبعض الأوامر. 4) شريط المهام السفلي: Start طريق مختصر للأوامر، و Ready تعني أن البرنامج جاهز للعمل.`],
+[`فتح ملف M-File`,`ثلاث طرق: File ثم New ثم M-File، أو الضغط على Ctrl+N، أو الضغط على الأيقونة البيضاء في الركن العلوي الأيسر. وعند الضغط على Run يطلب حفظ الملف، وبعدها يحفظ تلقائيًا في كل تشغيل.`],
+[`>>`,`علامة الحث (Prompt) في نافذة الأوامر؛ تعني أن ماتلاب جاهز لاستلام أمر. تظهر تلقائيًا ولا تُكتب.`],
+[`=`,`عامل الإسناد: يضع قيمة التعبير الذي على يمينه في المتغير الذي على يساره، وليس معادلة رياضية.`,`x = 5`],
+[`ans`,`متغير يخزّن فيه ماتلاب ناتج آخر تعبير لم تُسنده إلى متغير.`,`3 + 4\nans * 2`],
+[`;`,`الفارزة المنقوطة في نهاية الأمر تمنع طباعة الناتج (لكن الأمر يُنفذ ويُخزَّن).`,`a = 3;`],
+[`,`,`الفاصلة تفصل بين عدة أوامر في سطر واحد مع إبقاء طباعة نواتجها.`,`a = 1, b = 2`],
+[`...`,`ثلاث نقاط في نهاية السطر: يستمر الأمر في السطر التالي.`,`s = 1 + 2 + ...\n    3`],
+[`%`,`بداية تعليق؛ كل ما يأتي بعدها في السطر يتجاهله ماتلاب.`,`% This Program Compute Area`],
+[`clc`,`يمسح نافذة الأوامر فقط، ولا يحذف المتغيرات من الذاكرة.`],
+[`clear`,`يحذف كل المتغيرات والدوال من الذاكرة (مساحة العمل Workspace).`],
+[`who , whos`,`يعرضان أسماء المتغيرات الموجودة في مساحة العمل.`],
+[`↑ ↓`,`سهما لوحة المفاتيح لاسترجاع الأوامر السابقة (نافذة Command History).`],
+[`النوافذ الأربع`,`Command Window: لكتابة الأوامر وعرض النتائج. Workspace: أسماء المتغيرات وقيمها وأحجامها. Current Folder: المجلد الحالي وملفاته. Command History: سجل الأوامر المنفذة لإعادة تنفيذها.`],
+[`ملف نصي M-File (Script)`,`وسيلة لكتابة عدة أوامر وحفظها بالامتداد m. يُفتح من File > New > M-File أو Ctrl+N، وينفذ بالزر Run أو F5. في هذا المحاكي اضغط زر Script في الشريط العلوي.`],
+[`قواعد اسم الملف`,`لا يبدأ برقم، ولا يكون اسم أمر موجود في ماتلاب، ولا يحتوي مسافات ولا رموزًا مثل * & - +.`],
+[`لا حاجة للإعلان`,`لا تُعرَّف المتغيرات والثوابت وأنواع البيانات مسبقًا، وتُكتب أوامر ماتلاب بحروف صغيرة.`]]},
+{o:`تتناول المحاضرة الثوابت والمتغيرات والعمليات الحسابية والدوال المكتبية. تُكتب الجملة الحسابية بالشكل: متغير = تعبير حسابي.`,r:[
+[`+  -  *  /`,`الجمع والطرح والضرب والقسمة.`,`7/2`],
+[`^`,`الأس (القوة).`,`2^3`],
+[`\\`,`القسمة اليسارية: a\\b تساوي b÷a. ومع المصفوفات يحل A\\b النظام Ax = b.`,`2\\8`],
+[`( )`,`الأقواس: أعلى أسبقية، وتُستخدم أيضًا لاستدعاء الدوال وفهرسة العناصر.`,`(2+3)*4`],
+[`ترتيب الأسبقية`,`الأقواس () ثم الأس ^ ثم * / \\ ثم + -. وعند تساوي المستوى يُنفذ من اليسار إلى اليمين. ولذلك A/B+C تختلف عن A/(B+C).`,`2 + 3*4^2\n6/2+1\n6/(2+1)`],
+[`كتابة الجبر`,`الضرب الضمني غير مقبول: يُكتب 3b بالشكل 3*b، و c² بالشكل c^2.`,`a=2; b=3;\na-3*b\n(a^2+b^2)/12`],
+[`E أو e`,`الصيغة العلمية: 2.0E3 تعني 2000، و 4.7E-3 تعني 0.0047.`,`2.0E3\n4.7E-3`],
+[`pi`,`الثابت π ≈ 3.14159.`,`pi`],
+[`i , j`,`الوحدة التخيلية √−1 (الأعداد المركبة من المنهج، لكنها غير محاكاة هنا).`],
+[`realmin , realmax , bitmax`,`أصغر عدد حقيقي موجب، وأكبر عدد حقيقي، وأكبر عدد صحيح يُمثَّل بدقة. وeps أصغر فرق بين عددين متجاورين.`,`realmax\nrealmin`],
+[`' '`,`علامتا اقتباس مفردتان: تحيطان بالنص (الجملة الرمزية String). لا يجوز وضع اقتباس مفرد داخل النص.`,`Dept = 'Physics'`],
+[`true , false`,`الثابتان المنطقيان: 1 (صحيح) و 0 (خطأ).`],
+[`قواعد أسماء المتغيرات`,`حساسة لحالة الأحرف (A غير a)، وتبدأ بحرف، وتتكون من حروف وأرقام و _ فقط، وحتى 63 رمزًا، ولا تكون كلمة محجوزة (if, end, for, break, else, global, return, function) ولا اسم دالة مثل sin.`],
+[`sqrt(x)`,`الجذر التربيعي.`,`sqrt(16)`],
+[`abs(x)`,`القيمة المطلقة.`,`abs(-7)`],
+[`exp(x)`,`الدالة الأسية e^x.`,`exp(1)`],
+[`log(x) , log10(x)`,`log: اللوغاريتم الطبيعي ln، و log10: اللوغاريتم العشري.`,`log(exp(2))\nlog10(1000)`],
+[`sin cos tan`,`الدوال المثلثية، والزاوية بالراديان (للدرجات اضرب في pi/180).`,`sin(pi/2)\ncos(60*pi/180)`],
+[`atan(x)`,`معكوس الظل (tan⁻¹) بالراديان. وتوجد asin و acos بالمثل.`,`atan(1)`],
+[`fix  floor  ceil  round`,`fix: التقريب نحو الصفر. floor: نحو الأسفل. ceil: نحو الأعلى. round: لأقرب عدد صحيح. عند 2.6 و −2.6 تعطي: 2/−2 و 2/−3 و 3/−2 و 3/−3.`,`fix(-2.7), floor(-2.7)\nceil(-2.2), round(2.5)`],
+[`mod(a,b) , rem(a,b)`,`باقي قسمة a على b.`,`mod(10,3)`],
+[`sign(x)`,`إشارة العدد: 1 موجب، 0 صفر، −1 سالب.`],
+[`isprime  primes  factor`,`isprime(n) تعيد 1 للعدد الأولي. primes(n) تسرد الأولية حتى n. factor(n) تعطي عوامله الأولية.`,`isprime(7)\nprimes(20)\nfactor(60)`],
+[`gcd , lcm`,`القاسم المشترك الأكبر والمضاعف المشترك الأصغر.`,`gcd(12,18)\nlcm(4,6)`],
+[`factorial(n)`,`مضروب العدد n!.`,`factorial(5)`],
+[`.*  ./  .^`,`العمليات عنصرًا بعنصر على المصفوفات (النقطة قبل العامل). تُستخدم عند حساب دالة على متجه كامل.`,`x = 1:4;\nx.^2`],
+[`أنواع الثوابت`,`عددية: صحيحة (23+ ، 0 ، -4 ، 472) وحقيقية (0.0 ، -4.0 ، 600.04) وعلمية (2.0E3) وعقدية (sqrt(-2) ، 6-9i). ورمزية: نص بين ' '. ومنطقية: 1 و 0.`],
+[`المتغيرات العددية والرمزية`,`المتغير العددي (Numerical) قيمته عدد صحيح أو حقيقي أو أسي أو عقدي، واسمه حرف أو أكثر ثم أرقام أو _ حتى 63 رمزًا (مثل Ali_Ahmed ، X2 ، S2 ، ks ، K). والمتغير الرمزي (String) قيمته نص بين ' '.`,`X2 = 15.5\nks = 'My birthday = 1970'`],
+[`المقارنة تنتج ثابتًا منطقيًا`,`نتيجة المقارنة 1 (true) أو 0 (false) وتُعدّ ثابتًا منطقيًا.`,`3 < 3\n-5 < 6\n0 > 5`],
+[`real(x) , imag(x)`,`استخراج الجزء الحقيقي والجزء الخيالي للعدد العقدي c = 2-3i تعطيان 2 و −3. (الأعداد العقدية غير محاكاة هنا، فالمثال للمرجع فقط.)`],
+[`الجملة الحسابية`,`متغير = تعبير حسابي. والتعبير يتكون من ثوابت ومتغيرات ورموز حسابية. أمثلة التحويل: a−3b تُكتب a-3*b ، و c²−10 تُكتب c^2-10 ، و (a²+b²)/12 تُكتب (a^2+b^2)/12 ، و M(7d−8g) تُكتب M*(7*d-8*g).`,`a=2; b=3; c=4; M=2; d=1; g=1;\na-3*b\nc^2-10\n(a^2+b^2)/12\nM*(7*d-8*g)`]]},
+{o:`المصفوفة قائمة من الأرقام مرتبة في صفوف وأعمدة. المتجه (أحادي البعد) صف أو عمود، والمصفوفة ثنائية البعد m×n لها m من الصفوف و n من الأعمدة.`,r:[
+[`[ ]`,`الأقواس المربعة لتكوين متجه أو مصفوفة.`],
+[`المسافة أو ,`,`تفصل بين عناصر الصف الواحد (الأعمدة).`,`r = [2 4 5 6 7]\nr = [2,4,5,6,7]`],
+[`;  داخل [ ]`,`تفصل بين الصفوف؛ لذا [2;4;5] متجه عمودي. ويمكن بدلًا منها الضغط على Enter بين الصفوف.`,`c = [2;4;5]\nA = [1 2 3; 4 5 6; 7 8 9]`],
+[`m:q:n`,`إنشاء متجه منتظم: m العنصر الأول، q الخطوة، n الأخير. الخطوة المحذوفة تساوي 1 ويمكن أن تكون سالبة.`,`x = [1:2:13]\nz = [-3:7]\nxa = [21:-3:6]`],
+[`linspace(a,b,n)`,`n نقطة متساوية البعد من a إلى b.`,`linspace(0,1,5)`],
+[`v(k)`,`العنصر ذو الموضع k في المتجه (الفهرسة تبدأ من 1). والإسناد v(k)=قيمة يغيّره.`,`v = [35 46 78 23];\nv(4)\nv(4) = 2`],
+[`A(m,n)`,`العنصر في الصف m والعمود n. ويمكن استخدامه في التعابير.`,`ma = [2 3 5;6 8 9;0 8 4];\nma(2,2)\nma(2,3) = 15`],
+[`:  في الفهرس`,`تعني «كل». A(:,n) العمود n بجميع صفوفه. A(n,:) الصف n بجميع أعمدته. A(m:n,:) صفوف من m إلى n. A(:,m:n) أعمدة. A(m:n,p:q) كتلة جزئية. A(:) كل العناصر عمودًا واحدًا. و end آخر فهرس.`,`A=[1 3 5 7; 2 4 6 8; 3 6 9 12];\nA(:,3)\nA(2,:)\nA(2:3,2:4)\nA(end,end)`],
+[`'`,`المدور (Transpose): يحوّل الصفوف إلى أعمدة وبالعكس. وتؤدي transpose(A) الوظيفة ذاتها.`,`A = [2 3 5; 1 5 7];\nA'`],
+[`length(A)`,`طول المتجه، أو أكبر بُعد في المصفوفة.`,`length([5 9 2 4])`],
+[`size(A)`,`أبعاد المصفوفة [صفوف أعمدة].`,`size([6 1 4 0 12; 5 19 6 8 2])`],
+[`numel(A) , ndims(A)`,`numel عدد العناصر الكلي. ndims عدد الأبعاد (2 للمصفوفة).`,`A=[2 3 5;1 5 7];\nnumel(A)\nndims(A)`],
+[`reshape(A,m,n)`,`إعادة تشكيل المصفوفة إلى m×n بشرط ثبات عدد العناصر (يُقرأ عمودًا بعد عمود).`,`reshape([5 1 6;8 0 2],3,2)`],
+[`diag(A)`,`متجه العناصر القطرية للمصفوفة. وإذا كان المدخل متجهًا تنشئ مصفوفة قطرية.`,`diag([1 2 3;4 5 6;7 8 9])`],
+[`sort(A)`,`ترتيب تصاعدي. والصيغة [y,indx]=sort(A) تعطي أيضًا الأماكن الأصلية. وrandperm(n) ترتيب عشوائي للأعداد 1..n.`,`[y,indx] = sort([7 5 2 1 3 6 4 8])\nrandperm(8)`],
+[`find(شرط)`,`تعيد مواقع (أدلة) العناصر التي يتحقق فيها الشرط. [i,j]=find(A>6) تعطي أرقام الصفوف والأعمدة.`,`x = -3:3;\nk = find(abs(x) > 1)\ny = x(k)`],
+[`mean  median  std`,`المتوسط الحسابي، والوسيط، والانحراف المعياري. وفي المصفوفة تُحسب لكل عمود.`,`A=[5 9 2 4];\nmean(A), median(A), std(A)`],
+[`max  min  sum`,`أكبر عنصر، وأصغر عنصر، ومجموع العناصر. للمتجه تعطي قيمة واحدة، وللمصفوفة قيمة لكل عمود. [d,n]=max(A) تعطي القيمة وموقعها. max(A') لكل صف، و max(max(A)) الأكبر في المصفوفة كلها.`,`A=[1 2 3;4 5 2;7 0 9];\nmax(A)\nmax(A')\nmax(max(A))\nsum(sum(A))`],
+[`det(A) , inv(A)`,`محدد المصفوفة ومعكوسها (للمصفوفة المربعة غير المنفردة).`,`A=[2 4;3 5];\ndet(A)\ninv(A)`],
+[`trace(A) , eig(A)`,`trace مجموع القطر الرئيسي. eig القيم الذاتية.`,`A=[2 1;1 3];\ntrace(A)\neig(A)`],
+[`dot(a,b)`,`الضرب العددي (القياسي) لمتجهين.`,`dot([1 2 3],[3 4 5])`],
+[`cross(a,b)`,`الضرب الاتجاهي لمتجهين كل منهما من 3 عناصر.`,`cross([1 3 2],[2 4 1])`],
+[`flipud(A) , fliplr(A)`,`قلب المصفوفة من الأعلى للأسفل (up-down) ومن اليسار لليمين (left-right).`,`A=[1 2 3;4 5 6;7 8 9];\nflipud(A)\nfliplr(A)`],
+[`triu(A) , tril(A)`,`استخلاص المثلث العلوي (upper) والسفلي (lower) وتصفير الباقي.`,`A=[1 2 3;4 5 6;7 8 9];\ntriu(A)\ntril(A)`],
+[`circshift(A,n)`,`إزاحة حلقية: تنقل الصفوف للأسفل بمقدار n (للأعلى إن كان سالبًا). circshift(A,[r c]) تزيح الصفوف بمقدار r والأعمدة بمقدار c، وتعود العناصر من الطرف الآخر.`,`a=[1 2 3;4 5 6;7 8 9];\ncircshift(a,1)\ncircshift(a,[0 1])`]]},
+{o:`تبيّن المحاضرة كيف تُعرَّف المتغيرات بإدخال القيم من المستخدم (الإدخال)، وكيف تُطبع النتائج (الإخراج) من الملف النصي إلى نافذة الأوامر.`,r:[
+[`x = input('رسالة')`,`تعرض الرسالة وتقرأ قيمة عددية وتخزنها في x. الرسالة نص بين اقتباسين مفردين.`,`n = input('Enter n: ');`],
+[`input('رسالة','s')`,`المعامل 's' يجعل المدخل نصًا (String) كما كُتب.`,`z = input('enter z','s')`],
+[`input لمتجه`,`عند ظهور الرسالة اكتب القوس المربع [ ثم العناصر لإدخال متجه أو مصفوفة.`,`v = input('Enter vector: ')`],
+[`inputdlg(prompt,dlgTitle,lineNo,def)`,`مربع حوار للإدخال: prompt نص الرسالة، dlgTitle عنوان النافذة، lineNo عدد السطور، def القيمة الافتراضية. prompt و def تكتب بين { }، والصيغة المختصرة inputdlg(prompt,dlgTitle).`,`prompt = {'enter x'};\ndef = {'20'};\nanswer = inputdlg(prompt,'Input',1,def);`],
+[`answer{1}`,`الأقواس { } تفهرس مصفوفة الخلايا؛ والإجابة تُرجَع نصًا في الخلية الأولى.`],
+[`str2num , str2double`,`تحويل النص (string) إلى عدد للتعامل معه رقميًا.`,`answer = inputdlg('Enter a number:');\nx = str2num(answer{1})`],
+[`disp(x)`,`يعرض قيمة المتغير بدون اسمه، أو يعرض نصًا بين اقتباسين.`,`disp([1 2; 3 4])\ndisp('The problem has no solution.')`],
+[`disp([ ])`,`يجب أن تكون محتويات disp الواحدة من نوع واحد؛ فلدمج نص مع عدد حوّل العدد بـ num2str وضع الجميع بين [ ].`,`sum = 9.8;\ndisp(['sum=', num2str(sum)])`],
+[`num2str(x)`,`يحوّل العدد إلى نص.`],
+[`disp لجدول`,`اطبع العناوين بـ disp، ثم سطرًا فارغًا disp(' ')، ثم المصفوفة التي أعمدتها البيانات.`,`yr=[1984 1986 1988]; pop=[127 130 136];\nT=[yr' pop'];\ndisp('  YEAR  POPULATION')\ndisp(' ')\ndisp(T)`],
+[`msgbox('نص','عنوان')`,`يعرض نافذة رسالة منبثقة (للنصوص فقط).`,`msgbox('ok','r')`],
+[`fprintf('نص')`,`يطبع عبارة رمزية. و \\n تنقل ما بعدها إلى سطر جديد.`,`fprintf('Line 1.\\nLine 2.')`],
+[`%d  %i`,`رمز تنسيق: عدد صحيح.`],
+[`%f`,`رمز تنسيق: عدد عشري بنقطة ثابتة (6 مراتب عشرية افتراضيًا).`],
+[`%6.3f`,`العدد 6 العرض الكلي للحقل، و 3 عدد المراتب بعد الفارزة.`,`fprintf('pi = %6.3f\\n', pi)`],
+[`%e`,`رمز تنسيق: الصيغة الأسية.`],
+[`%c  %s`,`رمز واحد، ونص.`],
+[`%o  %x`,`ثماني وسداسي عشري.`],
+[`%`,`علامة % داخل النص تحدد مكان إدراج القيمة، و %% تطبع % نفسها.`],
+[`fprintf مع مصفوفة`,`تُقرأ المصفوفة عمودًا بعد عمود ويتكرر التنسيق حتى تنتهي العناصر.`,`x=1:5; y=sqrt(x); T=[x; y];\nfprintf('If the number is: %i, its square root is: %f\\n',T)`],
+[`تمرين: حرارة الرياح الباردة`,`Twc = 35.74 + 0.6215T − 35.75V^0.16 + 0.4275TV^0.16 حيث T بالفهرنهايت و V بالميل/ساعة. اكتب برنامجًا يطلب T و V ويطبع الناتج مقربًا لأقرب عدد صحيح (عند T=30 و V=42).`,`T = input('T (F): ');
+V = input('V (mi/h): ');
+Twc = 35.74+0.6215*T-35.75*V^0.16+0.4275*T*V^0.16;
+fprintf('The wind chill temperature is: %d\n', round(Twc))`],
+[`تمرين: إحصاءات الدرجات`,`برنامج يطلب متجه الدرجات بـ input ثم يحسب المتوسط والانحراف المعياري والوسيط وعدد الدرجات.`,`g = input('Enter grades: ');
+% try: [94 78 61 65 81 80 65 76 77 95 82 49 75]
+fprintf('Mean = %.2f\nStd = %.2f\nMedian = %g\nCount = %d\n', mean(g), std(g), median(g), length(g))`],
+[`تمرين: جدول قراءات تجربة`,`اطبع اسم التجربة ورمز المقرر ثم عناوين الأعمدة ثم القيم على هيئة جدول باستخدام disp و fprintf.`,`disp('Experiment: Ohm Law   Course: H260')
+disp('   V(volt)   I(A)')
+T = [1 0.1; 2 0.2; 3 0.31];
+fprintf('%8.2f %8.2f\n', T')`]]},
+{o:`تُستخدم المعاملات العلائقية والمنطقية لاتخاذ القرارات؛ ونتيجتها 1 (صحيح) أو 0 (خطأ)، وعليها تعتمد جمل الشرط if و switch.`,r:[
+[`<  <=  >  >=`,`أصغر من، أصغر أو يساوي، أكبر من، أكبر أو يساوي.`,`3 > 2\n5 <= 4`],
+[`==`,`يساوي (مقارنة). بينما = عامل إسناد.`,`5 == 4`],
+[`~=`,`لا يساوي.`,`7 ~= 8`],
+[`المقارنة على المصفوفات`,`تقارن مصفوفتين متساويتي الحجم عنصرًا بعنصر، أو مصفوفة بعدد مفرد. الناتج متجه منطقي من 0 و1 يمكن الانتقاء به: r(A) تُبقي المواضع التي قيمتها 1.`,`r = [2 4 7 9 0 1 3];\nA = r <= 4\nB = r(A)`],
+[`&`,`AND (و): الناتج 1 فقط إذا كان الطرفان غير صفريين. ومعادلها and(a,b).`,`3 & 7`],
+[`|`,`OR (أو): الناتج 1 إذا كان أحد الطرفين غير صفري. ومعادلها or(a,b).`,`a = 5 | 0`],
+[`~`,`NOT (النفي): يعكس القيمة المنطقية، ومعادلها not(a).`,`~25`],
+[`&&  ||`,`النسختان المختصرتان (للقيم المفردة): يتوقف التقييم عند معرفة النتيجة.`],
+[`ترتيب الأسبقية`,`من الأعلى للأدنى: الأقواس، الأس ^ والمدور '، الإشارة والنفي ~، * /، + -، النقطتان :، العلائقية، ثم & ثم |.`,`x = 4;\n-5 < x & x < 7`],
+[`if … end`,`ينفذ الجسم فقط إذا تحقق الشرط. كل if يجب أن تنتهي بـ end.`,`x = 5;\nif x > 3\n  disp('big')\nend`],
+[`else`,`المسار البديل عند عدم تحقق الشرط.`,`if mod(4,2)==0\n  disp('even')\nelse\n  disp('odd')\nend`],
+[`elseif`,`شرط إضافي يُفحص بالترتيب؛ ويُنفذ أول مسار صحيح فقط.`,`g = 72;\nif g >= 90\n  disp('A')\nelseif g >= 70\n  disp('B')\nelse\n  disp('C')\nend`],
+[`switch … case … otherwise … end`,`switch يقارن قيمة واحدة بعدة حالات case. تُنفذ أول حالة متطابقة فقط، و otherwise تُنفذ عند عدم تطابق أي حالة. والقوسان { } في case يطابقان أي قيمة من القائمة.`,`u = 143;\nswitch u\n  case 145\n    disp('Physics')\n  case {143,144}\n    disp('Chemistry')\n  otherwise\n    disp('Other')\nend`],
+[`جدول الحقيقة`,`لكل A و B: (0,0) تعطي & و | و ~A و ~B القيم 0 و 0 و 1 و 1. (0,1) تعطي 0 و 1 و 1 و 0. (1,0) تعطي 0 و 1 و 0 و 1. (1,1) تعطي 1 و 1 و 0 و 0.`,`A = [0 0 1 1]; B = [0 1 0 1];\nA & B\nA | B\n~A\n~B`],
+[`المنطق في العمليات الرياضية`,`يمكن استخدام المعاملات المنطقية داخل التعابير الرياضية؛ فالتعبير الآتي يعطي 50 لأن (12&0) = 0 و (~0) = 1 و (0|5) = 1.`,`t = 25*((12&0)+(~0)+(0|5))`],
+[`المنطق على المتجهات`,`الناتج متجه فيه 1 في كل موضع يتحقق فيه الشرط على العنصرين المتقابلين، و 0 فيما عدا ذلك.`,`x=[9 3 0 11 0 15]; y=[2 0 13 -11 0 4];\nx & y\nx | y\n~(x+y)`],
+[`تمرين: وحدات التخرج`,`اطبع اسم القسم عند إدخال عدد الوحدات: فيزياء 145 ، كيمياء 143 ، علم الأرض 140 ، علوم الحياة 141 ، رياضيات 138.`,`u = input('Units: ');\nswitch u\n  case 145\n    disp('Physics')\n  case 143\n    disp('Chemistry')\n  case 140\n    disp('Earth Science')\n  case 141\n    disp('Life Science')\n  case 138\n    disp('Mathematics')\n  otherwise\n    disp('Unknown')\nend`],
+[`تمرين: حاسبة`,`حاسبة تحسب sin(x) أو cos(x) أو sqrt(x) للعدد x حسب اختيار المستخدم باستخدام switch.`,`x = input('Enter x: ');\nc = input('1=sin, 2=cos, 3=sqrt: ');\nswitch c\n  case 1\n    disp(sin(x))\n  case 2\n    disp(cos(x))\n  case 3\n    disp(sqrt(x))\n  otherwise\n    disp('Invalid choice')\nend`]]},
+{o:`الحلقات التكرارية تنفذ أمرًا أو مجموعة أوامر عددًا من المرات. كل حلقة (for أو while) تنتهي بـ end.`,r:[
+[`for k = f:s:t`,`k متغير الحلقة (يجوز i, j, m, n …)، f قيمته في الدورة الأولى، s الزيادة بعد كل دورة، t قيمته في الدورة الأخيرة.`,`for k=1:3:10\n  x = k^2\nend`],
+[`الزيادة s`,`إذا حُذفت فهي 1، ويجوز أن تكون سالبة.`,`for k = 10:-2:1\n  disp(k)\nend`],
+[`حالات الحلقة`,`إذا f = t تُنفذ مرة واحدة. وإذا كانت s>0 و f>t، أو s<0 و f<t، فلا تُنفذ أبدًا.`],
+[`for k = [4 8 -9 0 7]`,`يجوز أن تأخذ k قائمة قيم خاصة بدل المدى.`,`for k=[4 8 -9 0 7]\n  disp(k)\nend`],
+[`قواعد الحلقة`,`لا تعدّل قيمة k داخل الحلقة. ولعرض k اطبع اسمها (بدون ;) أو disp(k). وكل for تنتهي بـ end.`],
+[`S = S + …`,`المجمّع (Accumulator): يُصفَّر قبل الحلقة S=0 ثم يُضاف إليه حد في كل دورة.`,`n = 4; S = 0;\nfor k = 1:n\n  S = S + (-1)^k*k/2^k;\nend\nfprintf('The sum is: %f\\n',S)`],
+[`A = [ ]`,`مصفوفة فارغة تُعرَّف قبل ملئها داخل الحلقة.`],
+[`mult(i,j) = i*j`,`الإسناد إلى عنصر بالفهرس داخل الحلقة؛ تُبنى به المصفوفة عنصرًا بعنصر.`,`for i=1:5\n  for j=1:5\n    mult(i,j) = i*j;\n  end\nend\ndisp(mult)`],
+[`حلقات متداخلة`,`الخارجية تعمل دورة واحدة ثم تكتمل الداخلية، ويتكرر ذلك؛ فإذا كانت الخارجية n والداخلية m تُنفذ الأوامر n×m مرة. ولكل حلقة end خاصة بها.`,`n=4; m=5; A=[];\nfor k=1:n\n  for h=1:m\n    if k==1\n      A(k,h)=h;\n    elseif h==1\n      A(k,h)=k;\n    else\n      A(k,h)=A(k,h-1)+A(k-1,h);\n    end\n  end\nend\nA`],
+[`while شرط`,`تُنفذ الأوامر طالما الشرط 1 (صحيح) وتتوقف عندما يصبح 0. لذا يجب أن يغيّر الجسم شيئًا يعتمد عليه الشرط وإلا تدور بلا نهاية.`,`x = 1\nwhile x <= 15\n  x = 2*x\nend`],
+[`while على متجه`,`طباعة العناصر حتى أول عدد سالب، مع زيادة الفهرس i في كل دورة.`,`x=[4 5 1 3 -2 10 4];\ni=1;\nwhile x(i)>0\n  disp(x(i))\n  i=i+1;\nend`],
+[`break`,`تُخرج من الحلقة فورًا عند تحقق شرط داخل if. في الحلقات المتداخلة تخرج من الحلقة التي تحتويها فقط. تعطي حلقة for ذات s>250 النتيجتين i=22 و s=253.`,`s = 0;\nfor i = 1:100\n  s = s + i;\n  if s > 250\n    break\n  end\nend\ni, s`],
+[`واجب: ناتج حلقتين متداخلتين`,`ما ناتج البرنامج عند n=3 و m=3؟ الحلقة الخارجية i والداخلية j، وكل عنصر result(i,j) = i^j. الجواب: الصف 1: 1 1 1، الصف 2: 2 4 8، الصف 3: 3 9 27.`,`n = 3; m = 3;
+for i = 1:n
+  for j = 1:m
+    result(i,j) = i^j;
+  end
+end
+disp(result)`],
+[`واجب: تحويل وحدة إلى سنتمتر`,`برنامج يقرأ عددًا ووحدته (inch، foot، meter، mm) ثم يحوله إلى سنتمترات باستخدام switch. 1 بوصة = 2.54 سم، 1 قدم = 30.48 سم، 1 متر = 100 سم، 1 ملم = 0.1 سم.`,`x = input('Value: ');
+u = input('Unit (inch/foot/meter/mm): ','s');
+switch u
+  case 'inch'
+    c = x*2.54;
+  case 'foot'
+    c = x*30.48;
+  case 'meter'
+    c = x*100;
+  case 'mm'
+    c = x*0.1;
+  otherwise
+    c = NaN;
+end
+fprintf('%g cm\n', c)`],
+[`واجب: معالجة عناصر متجه`,`للمتجه v: ضاعف العناصر الموجبة القابلة للقسمة على 3 أو 5، وارفع إلى القوة 3 العناصر السالبة الأكبر من −5.`,`v = [5,6,20,-6,12,-7,0,8,-3,17,-7,4,16];
+for k = 1:length(v)
+  if v(k) > 0 && (mod(v(k),3)==0 || mod(v(k),5)==0)
+    v(k) = 2*v(k);
+  elseif v(k) < 0 && v(k) > -5
+    v(k) = v(k)^3;
+  end
+end
+v`],
+[`واجب: العد التنازلي والتصاعدي`,`اطبع الأعداد من 10 إلى 1 بتناقص 2، ثم من 0 إلى 10 بزيادة 2.`,`for k = 10:-2:1
+  disp(k)
+end
+for k = 0:2:10
+  disp(k)
+end`]]},
+{o:`ينشئ ماتلاب الرسوم البيانية ثنائية وثلاثية الأبعاد. تُحسب قيم المتجهات أولًا ثم تُرسم، وتظهر الرسوم هنا في نافذة منبثقة (Figure).`,r:[
+[`plot(x,y)`,`رسم ثنائي الأبعاد: المتجه x على المحور الأفقي و y على العمودي، ويجب تساوي طولهما. اللون الافتراضي أزرق.`,`x = 0:0.2:6;\nplot(x, sin(x))`],
+[`plot(x,y,'--r*')`,`المعامل الثالث نص يجمع نمط الخط واللون والعلامة.`,`x = 0:0.2:6;\nplot(x, sin(x), '--r*')`],
+[`-  --  :  -.`,`أنماط الخط: متصل، متقطع، منقط، نقطة وشرطة.`],
+[`r g b c m y k w`,`الألوان: أحمر، أخضر، أزرق، سماوي، أرجواني، أصفر، أسود، أبيض.`],
+[`+ o * . x s d ^ v`,`العلامات (Markers): زائد، دائرة، نجمة، نقطة، x، مربع، معين، مثلث لأعلى، مثلث لأسفل.`],
+[`'linewidth',w`,`سمك الخط. و 'markersize',s حجم العلامة. تُكتب بعد النص الخاص بالنمط.`,`yr=1988:1994; s=[8 12 20 22 18 24 27];\nplot(yr,s,'--r*','linewidth',2,'markersize',12)`],
+[`.*  ./  .^`,`عند رسم دالة احسب y بعمليات عنصر بعنصر على المتجه x كله.`,`x = -2:0.01:4;\ny = 3.5.^(-0.5*x).*cos(6*x);\nplot(x,y)`],
+[`fplot('f',limits,'spec')`,`ترسم دالة مكتوبة نصًا على المجال [xmin xmax] أو [xmin xmax ymin ymax].`,`fplot('x^2+4*sin(2*x)-1',[-3 3])`],
+[`plot(x,y,u,v,t,h)`,`عدة منحنيات في رسم واحد: كل زوج بطول متساوٍ. ويُضاف نمط بعد كل زوج.`,`x=-2:0.01:4;\ny=3*x.^3-26*x+10;\nyd=9*x.^2-26;\nplot(x,y,'-b',x,yd,'--r')`],
+[`hold on / hold off`,`on: يُبقي الرسم الحالي لإضافة منحنيات إليه، و off: يعيد الوضع الاعتيادي.`],
+[`subplot(m,n,p)`,`شبكة رسوم m صفوف × n أعمدة، ويختار p اللوحة (تُعدّ صفًا بعد صف).`,`x=linspace(0,2*pi,30);\nsubplot(2,1,1); plot(x,sin(x))\nsubplot(2,1,2); plot(x,cos(x))`],
+[`xlabel  ylabel  zlabel`,`عناوين المحاور x و y و z.`,`xlabel('Time (s)')`],
+[`title('نص')`,`عنوان الرسم.`],
+[`legend('a','b')`,`مفتاح الرسم (أسماء المنحنيات بترتيب رسمها).`],
+[`grid on / off`,`إظهار الشبكة أو إخفاؤها.`],
+[`axis([x1 x2 y1 y2])`,`تحديد حدود المحورين. وهناك xlim([a b]) و ylim([a b]) لكل محور على حدة، و axis equal لتساوي المقياس.`],
+[`text(x,y,'نص')`,`كتابة نص عند الإحداثيين (x,y) داخل الرسم.`],
+[`plot3(x,y,z)`,`منحنى ثلاثي الأبعاد بثلاثة متجهات متساوية الطول.`,`t = linspace(0,10*pi,100);\nplot3(sin(t),cos(t),t)`],
+[`[X,Y] = meshgrid(x,y)`,`تُنشئ شبكة إحداثيات مصفوفية لحساب Z عند كل نقطة.`],
+[`surf(X,Y,Z) , mesh`,`رسم سطح ثلاثي الأبعاد. و peaks(30) تولد سطحًا نموذجيًا للتجربة.`,`[X,Y]=meshgrid(-2:0.25:2);\nsurf(X,Y,X.*exp(-X.^2-Y.^2))`],
+[`bar  barh`,`أعمدة رأسية وأفقية. bar(x,y,'r') بلون محدد.`,`bar([3 5 2 8])`],
+[`hist(y,x)`,`مدرج تكراري؛ x مراكز الفئات أو عددها.`,`hist(randn(1000,1),-2.9:0.1:2.9)`],
+[`pie(x)`,`مخطط دائري لنسب القيم.`,`pie([11 18 26 9 5])`],
+[`figure , clf , close`,`فتح رسم جديد، ومسح الرسم الحالي، وإغلاقه.`],
+[`الصيغة العامة`,`plot(x,y,'line specifiers','PropertyName',PropertyValue): المتجهان x و y متساويا الطول؛ يُرسم المنحنى من مقاطع مستقيمة تصل النقاط. وتُسمى محددات الخط اختيارية.`,`x=[1 2 3 5 7 7.5 8 10];\ny=[2 6.5 7 7 5.5 4 6 8];\nplot(x,y)`],
+[`legend('a','b',pos)`,`pos رقم موضع وسيلة الإيضاح (0,1,2,3,4) (في المحاكي تُعرض وسيلة الإيضاح في موضعها الافتراضي).`],
+[`رسوم أخرى (للمرجع)`,`يوفر ماتلاب أيضًا الرسم بمحاور لوغاريتمية وشبه لوغاريتمية، و bar وstairs، و polar، ومخططات شبكية. بعضها غير متاح في هذا المحاكي.`],
+[`text(x,y,z,'نص')`,`في الرسم الثلاثي الأبعاد يأخذ ثلاثة إحداثيات. وgrid on تُظهر الشبكة.`,`t = linspace(0,10*pi,100);\nplot3(sin(t),cos(t),t);\nxlabel('sin(t)'); ylabel('cos(t)'); zlabel('t');\ntext(0,0,0,'origin')\ngrid on`],
+[`[x y z] = peaks(30)`,`تولّد ثلاثة متجهات/مصفوفات لسطح نموذجي، ثم surf(x,y,z).`,`[x y z] = peaks(30);\nsurf(x,y,z);\nxlabel('x-axis'); ylabel('y-axis'); zlabel('z-axis')`],
+[`مثال subplot كامل`,`أربعة رسوم في شبكة 2×2؛ axis تحدد الحدود، و title العنوان، و eps أصغر فرق لتجنب القسمة على صفر.`,`x = linspace(0,2*pi,30);\ny = sin(x); z = cos(x);\na = 2*sin(x).*cos(x);\nb = sin(x)./(cos(x)+eps);\nsubplot(2,2,1); plot(x,y); axis([0 2*pi -1 1]); title('Figure1');\nsubplot(2,2,2); plot(x,z); axis([0 2*pi -1 1]); title('Figure2');\nsubplot(2,2,3); plot(x,a); axis([0 2*pi -1 1]); title('Figure3');\nsubplot(2,2,4); plot(x,b); axis([0 2*pi -20 20]); title('Figure4');`],
+[`تمرين 1`,`ارسم sin(x) من 0 إلى 4π.`,`x = 0:0.01:4*pi;\nplot(x,sin(x))`],
+[`تمرين 2`,`ارسم e^(−x/3)·sin(x) حيث 0 ≤ x ≤ 4π، مع تسمية المحورين وعنوان.`,`x = 0:0.01:4*pi;\ny = exp(-x/3).*sin(x);\nplot(x,y)\nxlabel('x'); ylabel('y'); title('exp(-x/3) sin(x)')`],
+[`تمرين 3`,`ارسم الدوال sin(x) و sin(x−0.25) و sin(x−0.5) على [0,2π] في رسم واحد.`,`x = linspace(0,2*pi,100);\nplot(x,sin(x),x,sin(x-0.25),x,sin(x-0.5))`],
+[`تمرين 4`,`ارسم f(x) = (x+1)(x−2)(2x−0.25) − e^x في رسمين: 0 ≤ x ≤ 3 ثم −3 ≤ x ≤ 6.`,`x = 0:0.01:3;\nf = (x+1).*(x-2).*(2*x-0.25)-exp(x);\nsubplot(2,1,1); plot(x,f)\nx = -3:0.01:6;\nf = (x+1).*(x-2).*(2*x-0.25)-exp(x);\nsubplot(2,1,2); plot(x,f)`],
+[`تمرين 6`,`باستخدام fplot ارسم f(x) = e^(2 sin(0.4x))·5cos(4x) لـ −20 ≤ x ≤ 30.`,`fplot('exp(2*sin(0.4*x)).*(5*cos(4*x))',[-20 30])`],
+[`تمرين 7`,`ارسم f(x) = cos(x)·sin(2x) ومشتقتها في رسم واحد على −π ≤ x ≤ π: الأول خط متصل والثاني متقطع، مع وسيلة إيضاح وأسماء المحاور.`,`x = -pi:0.01:pi;\nf = cos(x).*sin(2*x);\nd = -sin(x).*sin(2*x)+2*cos(x).*cos(2*x);\nplot(x,f,'-b',x,d,'--r')\nxlabel('x'); ylabel('f(x)')\nlegend('f','df/dx')`],
+[`تمرين 8`,`ارسم f(x) = (x²+3x+3)/(0.8(x+1)) على −4 ≤ x ≤ 3. الدالة غير معرفة عند x = −1، فنكوّن مجالين x1 من −4 إلى −1.1 و x2 من −0.9 إلى 3 ونرسم y1 مقابل x1 و y2 مقابل x2 في الرسم نفسه.`,`x1 = -4:0.01:-1.1;\nx2 = -0.9:0.01:3;\ny1 = (x1.^2+3*x1+3)./(0.8*(x1+1));\ny2 = (x2.^2+3*x2+3)./(0.8*(x2+1));\nplot(x1,y1,x2,y2)`]]}
+];
+
+let gsec=0;
+function guide(){const t=$('gtabs'),g=$('gbody');t.textContent='';g.textContent='';
+ const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=txt;return e};
+ G.forEach((s,i)=>{const b=document.createElement('button');b.className='tab';b.textContent=s.t[L()];b.setAttribute('aria-selected',i==gsec);b.onclick=()=>{gsec=i;guide()};t.appendChild(b)});
+ const B=BK[gsec],bx=mk('div','bk');bx.dir='rtl';bx.lang='ar';
+ bx.append(mk('h3','','ملزمة المراجعة — '+G[gsec].t[1]),mk('p','note',B.o),mk('h3','','شرح الرموز والمعاملات والدوال وقواعد الصياغة'));
+ B.r.forEach(r=>{const d=mk('div','gi');d.append(mk('b','code',r[0]),mk('p','',r[1]));if(r[2]){d.append(mk('pre','code gc',r[2]));const tb=mk('button','pri sm','▷ جرّب');tb.style.cssText='margin-block-end:4px';tb.onclick=()=>tryIt(r[2]);d.append(tb)}bx.appendChild(d)});
+ g.append(bx)}
+function tryIt(code){$('scr').value=code;$('mScr').hidden=false;run(code,true,null)}
+function flush(err){['con','sout'].forEach(id=>{const c=$(id);c.textContent=out;if(err){const x=document.createElement('span');x.className='err';x.textContent='Error: '+err;c.appendChild(x)}c.scrollTop=c.scrollHeight})}
+function run(code,fresh,echo){if(fresh||!env){env=new Map();fig=newFig();out=''}
+ if(echo)out+='>> '+(echo===true?code:echo)+'\n';steps=0;let err=null;plotted=0;
+ try{const b=block(split(code),0,[]);exec(b.nodes)}catch(e){err=e.message||String(e)}
+ flush(err);try{if(!err&&plotted&&Object.values(fig.axes).some(a=>a.s.length)){$('mFig').hidden=false;render()}else render()}catch(e){flush(String(e.message||e))}}
+function showMsg(m,t){$('mt').textContent=t||T[lang].title;$('mm').textContent=m;$('mMsg').hidden=false}
+function closeAll(){document.querySelectorAll('.modal').forEach(m=>m.hidden=true)}
+function setLang(l){lang=l;const d=document.documentElement;d.lang=l;d.dir=l=='ar'?'rtl':'ltr';document.title=T[l].title;$('langSel').value=l;
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=T[l][e.dataset.i]);
+ document.querySelectorAll('[data-p]').forEach(e=>e.placeholder=T[l][e.dataset.p]);
+ document.querySelectorAll('[data-ti]').forEach(e=>{e.title=T[l][e.dataset.ti];e.setAttribute('aria-label',T[l][e.dataset.ti])});
+ guide();if(fig&&!Object.values(fig.axes).some(a=>a.s.length))render()}
+function setTheme(t){document.documentElement.dataset.theme=t;$('themeBtn').textContent=t=='dark'?'☀':'☾';$('thSel').value=t;try{localStorage.setItem('mls-theme',t)}catch(e){}if(fig)render()}
+function applySt(){const r=document.documentElement.style;r.setProperty('--fs',ST.fs+'px');r.setProperty('--tc',ST.tc||'inherit');$('fszv').textContent=ST.fs;if(fig)render()}
+
+/* command line: history and multi-line blocks (for/while/if/switch wait for their "end") */
+let pend='',hist=[],hp=0;
+function go(){const raw=$('cmd').value;if(!raw.trim())return;$('cmd').value='';hist.push(raw);hp=hist.length;
+ const code=pend?pend+'\n'+raw:raw;
+ try{block(split(code),0,[])}catch(e){if(/Missing 'end'/.test(e.message)){pend=code;out+='>> '+raw+'\n';flush();$('pr').textContent='  ';return}}
+ pend='';$('pr').textContent='>>';run(code,false,raw)}
+$('cmd').onkeydown=e=>{if(e.key=='Enter')go();else if(e.key=='ArrowUp'&&hp>0){e.preventDefault();$('cmd').value=hist[--hp]}else if(e.key=='ArrowDown'){e.preventDefault();hp=Math.min(hp+1,hist.length);$('cmd').value=hist[hp]||''}};
+$('go').onclick=go;
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{b.closest('.modal').hidden=true});
+document.querySelectorAll('.modal').forEach(m=>m.onclick=e=>{if(e.target==m)m.hidden=true});
+$('setBtn').onclick=()=>{$('mSet').hidden=false};
+$('guideBtn').onclick=()=>{$('mSet').hidden=true;guide();$('mGuide').hidden=false};
+$('themeBtn').onclick=()=>setTheme(document.documentElement.dataset.theme=='dark'?'light':'dark');
+$('thSel').onchange=e=>setTheme(e.target.value);
+$('langSel').onchange=e=>setLang(e.target.value);
+$('fsz').oninput=e=>{ST.fs=+e.target.value;applySt()};
+$('lcol').oninput=e=>{ST.lc=e.target.value;applySt()};$('lreset').onclick=()=>{ST.lc=null;applySt()};
+$('tcol').oninput=e=>{ST.tc=e.target.value;applySt()};$('treset').onclick=()=>{ST.tc=null;applySt()};
+function runScr(){run($('scr').value,false,null)}
+$('scrRun').onclick=runScr;$('scrClr').onclick=()=>{$('scr').value='';$('scr').focus()};
+$('scrBtn').onclick=()=>{$('mScr').hidden=false;setTimeout(()=>$('scr').focus(),30)};$('figBtn').onclick=()=>{$('mFig').hidden=false;render()};$('conClr').onclick=()=>{out='';flush();$('cmd').focus()};
+$('scr').onkeydown=e=>{if(e.key=='Tab'){e.preventDefault();const t=e.target;t.setRangeText('  ',t.selectionStart,t.selectionEnd,'end')}else if(e.key=='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();runScr()}};
+document.addEventListener('keydown',e=>{if(e.key=='Escape'){const v=[...document.querySelectorAll('.modal:not([hidden])')];if(v.length)v[v.length-1].hidden=true}else if(e.key=='F5'&&document.activeElement===$('scr')){e.preventDefault();runScr()}});
+try{new ResizeObserver(()=>{try{Plotly.Plots.resize($('plot'))}catch(e){}}).observe($('plot'))}catch(e){}
+let th='light';try{th=localStorage.getItem('mls-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+env=new Map();fig=newFig();setTheme(th);setLang('en');render();$('cmd').focus();
+</script>
+</body>
+</html>
